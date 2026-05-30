@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bnb+ TYCOON v2 — ホステル経営シミュレーター</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap');
+  :root{
+    --bg:#0d1b2a; --bg2:#10243a; --panel:#13283f; --panel2:#173049;
+    --ink:#eaf2fb; --mut:#8aa0b8; --line:#23415f;
+    --gold:#e0a93a; --gold2:#f4c668; --green:#46c08a; --red:#e2675d;
+    --blue:#4f9ee8; --purple:#9b7bd4; --teal:#3fb6b0;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{height:100%}
+  body{font-family:'Zen Kaku Gothic New',sans-serif;background:radial-gradient(1200px 600px at 80% -10%, #1b3a5a 0%, transparent 60%),radial-gradient(900px 500px at 0% 110%, #14283f 0%, transparent 55%),var(--bg);color:var(--ink); overflow:hidden; user-select:none}
+  .app{display:flex; flex-direction:column; height:100vh}
+  .topbar{display:flex; align-items:center; gap:16px; padding:11px 18px; background:linear-gradient(180deg,rgba(19,40,63,.96),rgba(13,27,42,.9)); border-bottom:1px solid var(--line); z-index:30; backdrop-filter:blur(6px)}
+  .logo{font-family:'Outfit'; font-weight:900; font-size:20px; white-space:nowrap}
+  .logo span{color:var(--gold)} .logo small{display:block; font-size:8px; letter-spacing:3px; color:var(--mut); font-weight:600; margin-top:-2px}
+  .stats{display:flex; gap:8px; flex:1; flex-wrap:wrap}
+  .stat{background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:6px 12px; min-width:84px}
+  .stat .k{font-size:9px; color:var(--mut); letter-spacing:1px; font-weight:700}
+  .stat .v{font-family:'Outfit'; font-weight:800; font-size:17px; line-height:1.1}
+  .stat.cash .v{color:var(--gold2)} .stat.cash.neg .v{color:var(--red)} .stat.tok .v{color:var(--teal)}
+  .turn{font-family:'Outfit'; font-weight:800; font-size:14px; white-space:nowrap} .turn b{color:var(--gold2)}
+  .btn{font-family:'Zen Kaku Gothic New'; cursor:pointer; border:none; border-radius:11px; font-weight:700; transition:.15s; color:#0d1b2a}
+  .btn:active{transform:translateY(1px) scale(.98)}
+  .btn-next{background:linear-gradient(180deg,var(--gold2),var(--gold)); padding:10px 20px; font-size:14px; box-shadow:0 4px 0 #a9781f,0 8px 18px rgba(224,169,58,.35)}
+  .btn-next:hover{filter:brightness(1.06)} .btn-next:active{box-shadow:0 1px 0 #a9781f}
+  .regions{display:flex; gap:6px; padding:8px 18px 0; background:rgba(13,27,42,.5); z-index:20}
+  .rtab{background:var(--panel); border:1px solid var(--line); border-bottom:none; border-radius:10px 10px 0 0; padding:8px 16px 9px; cursor:pointer; font-weight:700; font-size:13px; color:var(--mut); position:relative; transition:.15s}
+  .rtab:hover{color:var(--ink)} .rtab.active{background:var(--bg); color:var(--ink)}
+  .rtab.active::after{content:""; position:absolute; left:0; bottom:-1px; width:100%; height:3px; background:var(--gold)}
+  .rtab.locked{opacity:.5; cursor:not-allowed} .rtab .em{margin-right:6px} .rtab .lk{font-size:10px; color:var(--gold2); margin-left:6px}
+  .main{flex:1; display:flex; min-height:0}
+  .stage{flex:1; position:relative; overflow:hidden}
+  .ground{position:absolute; inset:0; display:flex; align-items:center; justify-content:center}
+  .grid{position:relative; transform:rotateX(56deg) rotateZ(-45deg); transform-style:preserve-3d}
+  .cell{position:absolute; width:120px; height:120px; border:1px solid rgba(79,158,232,.18); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:.15s}
+  .cell:hover{box-shadow:inset 0 0 0 2px var(--gold)}
+  .cell.empty::after{content:"＋"; color:rgba(138,160,184,.4); font-size:32px; font-weight:300}
+  .cell.locked{cursor:not-allowed; background:repeating-linear-gradient(45deg,#0f2236,#0f2236 8px,#122845 8px,#122845 16px); opacity:.55}
+  .cell.locked::after{content:"🔒"; font-size:24px} .cell.locked:hover{box-shadow:none}
+  .cell.built.sel{box-shadow:inset 0 0 0 3px var(--gold2)}
+  .hostel{width:90px; height:90px; transform:translateZ(1px); display:flex; align-items:flex-end; justify-content:center}
+  .hbody{width:78px; height:60px; border-radius:6px 6px 4px 4px; position:relative; box-shadow:0 6px 0 rgba(0,0,0,.25)}
+  .hbody .win{position:absolute; width:9px; height:9px; border-radius:2px; background:#0d2034}
+  .hbody .win.on{background:var(--gold2); box-shadow:0 0 6px var(--gold2)}
+  .roof{position:absolute; top:-9px; left:50%; transform:translateX(-50%); width:84px; height:11px; border-radius:4px; background:#0e3552}
+  .tag{position:absolute; top:-28px; left:50%; transform:translateX(-50%) rotateZ(45deg) rotateX(-56deg); background:var(--gold); color:#0d1b2a; font-family:'Outfit'; font-weight:800; font-size:10px; padding:3px 7px; border-radius:7px; white-space:nowrap; box-shadow:var(--shadow)}
+  .occbar{position:absolute; bottom:-12px; left:9px; width:60px; height:6px; background:#0d2034; border-radius:4px; transform:rotateZ(45deg) rotateX(-56deg)}
+  .occbar i{display:block; height:100%; border-radius:4px; background:var(--green); transition:.4s}
+  .float{position:absolute; font-family:'Outfit'; font-weight:800; font-size:16px; pointer-events:none; animation:floatup 1.5s ease-out forwards; z-index:20}
+  @keyframes floatup{0%{opacity:0;transform:translateY(0)}15%{opacity:1}100%{opacity:0;transform:translateY(-46px)}}
+  .hint{position:absolute; left:50%; bottom:18px; transform:translateX(-50%); background:rgba(13,27,42,.85); border:1px solid var(--line); color:var(--mut); padding:8px 16px; border-radius:20px; font-size:13px; backdrop-filter:blur(4px); white-space:nowrap}
+  .hint b{color:var(--gold2)}
+  .region-desc{position:absolute; top:14px; left:18px; background:rgba(13,27,42,.8); border:1px solid var(--line); border-radius:12px; padding:10px 14px; max-width:260px; backdrop-filter:blur(4px)}
+  .region-desc .rn{font-family:'Outfit'; font-weight:800; font-size:15px} .region-desc .rd{font-size:11px; color:var(--mut); line-height:1.5; margin-top:3px}
+  .toast{position:absolute; top:14px; left:50%; transform:translateX(-50%) translateY(-80px); background:var(--panel2); border:1px solid var(--gold); border-left:5px solid var(--gold); padding:13px 18px; border-radius:14px; box-shadow:var(--shadow); max-width:420px; opacity:0; transition:.4s; z-index:25}
+  .toast.show{transform:translateX(-50%) translateY(0); opacity:1}
+  .toast .t{font-weight:900; color:var(--gold2); font-size:14px; margin-bottom:2px} .toast .d{font-size:12.5px; line-height:1.4}
+  .toast.bad{border-color:var(--red); border-left-color:var(--red)} .toast.bad .t{color:var(--red)}
+  .toast.good{border-color:var(--green); border-left-color:var(--green)} .toast.good .t{color:var(--green)}
+  .toast.tok{border-color:var(--teal); border-left-color:var(--teal)} .toast.tok .t{color:var(--teal)}
+  .side{width:330px; background:linear-gradient(180deg,var(--panel),var(--bg2)); border-left:1px solid var(--line); display:flex; flex-direction:column; z-index:10}
+  .side-tabs{display:flex; border-bottom:1px solid var(--line)}
+  .stab{flex:1; padding:11px; text-align:center; cursor:pointer; font-weight:700; font-size:12px; color:var(--mut); transition:.15s; border-bottom:2px solid transparent}
+  .stab:hover{color:var(--ink)} .stab.active{color:var(--gold2); border-bottom-color:var(--gold)}
+  .side-body{padding:15px 17px; overflow-y:auto; flex:1}
+  .side-body::-webkit-scrollbar{width:7px} .side-body::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px}
+  .empty-msg{color:var(--mut); font-size:13px; line-height:1.7; text-align:center; margin-top:26px}
+  .empty-msg .big{font-size:38px; display:block; margin-bottom:8px}
+  .det-name{font-family:'Outfit'; font-weight:800; font-size:19px} .det-sub{font-size:11px; color:var(--mut); margin:2px 0 13px}
+  .badge{display:inline-block; background:var(--panel2); border:1px solid var(--line); border-radius:6px; padding:1px 7px; margin-right:5px; color:var(--gold2); font-weight:700}
+  .badge.g{color:var(--green)} .badge.t{color:var(--teal)}
+  .kpi-row{display:flex; gap:7px; margin-bottom:13px}
+  .kpi{flex:1; background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:8px}
+  .kpi .k{font-size:9px; color:var(--mut); letter-spacing:1px; font-weight:700} .kpi .v{font-family:'Outfit'; font-weight:800; font-size:16px}
+  .kpi .v.g{color:var(--green)} .kpi .v.r{color:var(--red)} .kpi .v.gd{color:var(--gold2)}
+  .lab{font-size:11px; color:var(--mut); font-weight:700; letter-spacing:1px; margin:13px 0 6px}
+  .price-disp{display:flex; align-items:baseline; gap:6px; margin-bottom:5px}
+  .price-disp .p{font-family:'Outfit'; font-weight:900; font-size:28px; color:var(--gold2)} .price-disp .u{font-size:11px; color:var(--mut)}
+  input[type=range]{width:100%; accent-color:var(--gold); cursor:pointer; height:5px}
+  .occ-pred{display:flex; justify-content:space-between; font-size:11px; color:var(--mut); margin-top:5px} .occ-pred b{color:var(--ink)}
+  .meter{height:9px; background:#0d2034; border-radius:6px; overflow:hidden; margin-top:6px}
+  .meter i{display:block; height:100%; border-radius:6px; transition:.3s; background:linear-gradient(90deg,var(--red),var(--gold),var(--green))}
+  .invest{display:flex; flex-direction:column; gap:7px; margin-top:5px}
+  .iv{display:flex; align-items:center; gap:10px; background:var(--panel2); border:1px solid var(--line); border-radius:11px; padding:9px 11px; cursor:pointer; transition:.15s}
+  .iv:hover{border-color:var(--gold); background:#1c3854} .iv.done{opacity:.5; cursor:default; border-color:var(--green)} .iv.done:hover{background:var(--panel2)}
+  .iv .ic{font-size:20px; width:28px; text-align:center} .iv .tx{flex:1} .iv .tx .n{font-weight:700; font-size:13px} .iv .tx .e{font-size:10.5px; color:var(--mut)}
+  .iv .cost{font-family:'Outfit'; font-weight:800; color:var(--gold2); font-size:12px} .iv.done .cost{color:var(--green)}
+  .tok-hero{background:linear-gradient(135deg,#13403e,#103048); border:1px solid var(--teal); border-radius:14px; padding:16px; text-align:center; margin-bottom:14px}
+  .tok-hero .amt{font-family:'Outfit'; font-weight:900; font-size:34px; color:var(--teal)} .tok-hero .lbl{font-size:11px; color:var(--mut); letter-spacing:1px} .tok-hero .sub{font-size:11px; color:var(--mut); margin-top:6px; line-height:1.5}
+  .prog-wrap{margin:10px 0} .prog-lab{display:flex; justify-content:space-between; font-size:11px; color:var(--mut); margin-bottom:4px}
+  .prog{height:12px; background:#0d2034; border-radius:7px; overflow:hidden} .prog i{display:block; height:100%; background:linear-gradient(90deg,var(--teal),var(--green)); transition:.4s}
+  .tok-act{background:var(--panel2); border:1px solid var(--line); border-radius:11px; padding:12px; margin-top:8px}
+  .tok-act .n{font-weight:700; font-size:14px; margin-bottom:3px} .tok-act .d{font-size:11px; color:var(--mut); line-height:1.5; margin-bottom:9px}
+  .tok-btn{width:100%; padding:10px; border-radius:9px; font-weight:800; cursor:pointer; border:none; font-size:13px; background:linear-gradient(180deg,var(--teal),#2e8e89); color:#062826; transition:.15s}
+  .tok-btn:hover{filter:brightness(1.08)} .tok-btn:active{transform:translateY(1px)} .tok-btn:disabled{opacity:.4; cursor:not-allowed; filter:grayscale(.5)}
+  .rank-hero{text-align:center; margin-bottom:14px} .rank-medal{font-size:54px; line-height:1} .rank-name{font-family:'Outfit'; font-weight:900; font-size:22px; margin-top:4px} .rank-stage{font-size:12px; color:var(--gold2); font-weight:700}
+  .score-big{font-family:'Outfit'; font-weight:900; font-size:30px; color:var(--gold2); text-align:center}
+  .lead{margin-top:6px} .lead-row{display:flex; align-items:center; gap:10px; padding:9px 11px; border-radius:10px; margin-bottom:5px; background:var(--panel2); border:1px solid var(--line)}
+  .lead-row.you{border-color:var(--gold); background:linear-gradient(135deg,#1f3a2c,#14283f)}
+  .lead-row .rk{font-family:'Outfit'; font-weight:900; font-size:16px; width:26px; color:var(--mut)} .lead-row.you .rk{color:var(--gold2)}
+  .lead-row .nm{flex:1; font-weight:700; font-size:13px} .lead-row .sc{font-family:'Outfit'; font-weight:800; font-size:14px; color:var(--gold2)} .lead-row .av{font-size:18px}
+  .modal-bg{position:fixed; inset:0; background:rgba(5,12,20,.74); display:none; align-items:center; justify-content:center; z-index:50; backdrop-filter:blur(3px)}
+  .modal-bg.show{display:flex}
+  .modal{width:min(640px,93vw); background:linear-gradient(180deg,var(--panel),var(--bg2)); border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow); overflow:hidden; animation:pop .3s cubic-bezier(.2,1.3,.5,1)}
+  @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal-h{padding:20px 24px 6px} .modal-h .t{font-family:'Outfit'; font-weight:900; font-size:20px} .modal-h .s{font-size:12px; color:var(--mut); margin-top:2px}
+  .cards{display:grid; grid-template-columns:1fr 1fr 1fr; gap:11px; padding:13px 24px 6px}
+  .cards.two{grid-template-columns:1fr 1fr}
+  .card{background:var(--panel2); border:1px solid var(--line); border-radius:14px; padding:13px; cursor:pointer; transition:.15s; position:relative}
+  .card:hover{border-color:var(--gold); transform:translateY(-3px); box-shadow:var(--shadow)}
+  .card.bad{opacity:.45; cursor:not-allowed} .card.bad:hover{transform:none; border-color:var(--line); box-shadow:none}
+  .card .emoji{font-size:28px} .card .cn{font-weight:800; font-size:14px; margin:5px 0 2px} .card .cd{font-size:10.5px; color:var(--mut); line-height:1.45; min-height:42px}
+  .card .stats2{display:flex; flex-direction:column; gap:2px; margin-top:8px; font-size:10.5px} .card .stats2 div{display:flex; justify-content:space-between} .card .stats2 b{font-family:'Outfit'; font-weight:800}
+  .card .pill{position:absolute; top:9px; right:9px; font-size:9px; background:var(--gold); color:#0d1b2a; font-weight:800; padding:2px 6px; border-radius:6px}
+  .modal-f{padding:6px 24px 20px; display:flex; justify-content:space-between; align-items:center} .modal-f .note{font-size:11px; color:var(--mut); max-width:380px; line-height:1.5}
+  .x{background:var(--panel2); border:1px solid var(--line); color:var(--mut); padding:9px 18px; border-radius:10px; cursor:pointer; font-weight:700} .x:hover{color:var(--ink)}
+  .report{text-align:center} .report .ttl{font-family:'Outfit'; font-weight:900; font-size:23px; padding:22px 24px 4px} .report .yr{color:var(--gold2)}
+  .rep-rows{padding:6px 28px 4px} .rep-row{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--line); font-size:14px} .rep-row .v{font-family:'Outfit'; font-weight:800}
+  .rep-row.tot{border-bottom:none; font-size:17px; margin-top:4px} .rep-row.tot .v.g{color:var(--green)} .rep-row.tot .v.r{color:var(--red)}
+  @media (max-width:900px){.side{display:none} .stats .stat:nth-child(n+5){display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="logo">bnb<span>+</span> TYCOON<small>HOSTEL SIM v2</small></div>
+    <div class="stats">
+      <div class="stat cash" id="st-cash"><div class="k">資金</div><div class="v">¥0</div></div>
+      <div class="stat tok" id="st-tok"><div class="k">トークン</div><div class="v">0</div></div>
+      <div class="stat"><div class="k">店舗数</div><div class="v" id="st-stores">0</div></div>
+      <div class="stat"><div class="k">月間利益</div><div class="v" id="st-profit">¥0</div></div>
+      <div class="stat"><div class="k">店長ランク</div><div class="v" id="st-rank" style="font-size:14px">見習い</div></div>
+    </div>
+    <div class="turn" id="turn">1年目 <b>4月</b></div>
+    <button class="btn btn-next" id="next">次の月 ▶</button>
+  </div>
+  <div class="regions" id="regions"></div>
+  <div class="main">
+    <div class="stage">
+      <div class="ground"><div class="grid" id="grid"></div></div>
+      <div class="region-desc" id="region-desc"></div>
+      <div class="hint" id="hint">空き地を<b>タップ</b>して1号店を建てよう</div>
+      <div class="toast" id="toast"><div class="t"></div><div class="d"></div></div>
+    </div>
+    <div class="side">
+      <div class="side-tabs">
+        <div class="stab active" data-tab="store">🏨 店舗</div>
+        <div class="stab" data-tab="token">🪙 トークン</div>
+        <div class="stab" data-tab="rank">🏆 ランク</div>
+      </div>
+      <div class="side-body" id="side-body"></div>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="modal-bg"><div class="modal" id="modal"></div></div>
+<script>
+const F=n=>"¥"+Math.round(n).toLocaleString();
+const Fm=n=>"¥"+(Math.round(n/1e4)).toLocaleString()+"万";
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const MONTHS=["4月","5月","6月","7月","8月","9月","10月","11月","12月","1月","2月","3月"];
+const REGIONS={
+  tokyo:{name:"東京（都内コアモデル）",emoji:"🗼",unlock:0,desc:"高稼働・高単価。築古×好立地で利回り27%超の主軸。休日は満床になりやすい。",season:[1.0,1.02,0.95,1.1,1.18,1.0,1.05,1.08,1.22,1.16,0.9,0.96],occMul:1.0,ground:"#1b3650",grid:[1,1,0,1,1,0,0,0,0],areas:["A","A","B","A","A","B","C","C","B"],
+    props:[{id:"old",emoji:"🏚️",name:"築古ビル",desc:"賃料・初期費が安い。bnb+の王道。",init:2900,beds:40,rent:115,baseOcc:0.54,ceil:0.95,body:"linear-gradient(135deg,#b89a72,#8f7350)"},
+      {id:"mid",emoji:"🏢",name:"中規模テナント",desc:"バランス型。手堅いがコストもそれなり。",init:4200,beds:48,rent:160,baseOcc:0.5,ceil:0.88,body:"linear-gradient(135deg,#c9d6e3,#9fb0c4)"},
+      {id:"prime",emoji:"🏬",name:"駅前一等地",desc:"稼働の天井は高いが家賃が重い。単価勝負。",init:6100,beds:36,rent:240,baseOcc:0.46,ceil:0.98,body:"linear-gradient(135deg,#d8e2ee,#aebfd2)"}]},
+  motomachi:{name:"第二都市モデル（元町）",emoji:"⚓",unlock:3,desc:"共用部を整えると出張リピート客をつかめる。イベント時は高単価。家賃1.3万/坪が目安。",season:[1.0,1.05,0.98,1.05,1.1,1.02,1.08,1.12,1.15,1.05,0.92,1.0],occMul:0.92,ground:"#1d3a42",grid:[1,1,1,1,0,1],areas:["A","A","B","A","B","B"],
+    props:[{id:"comm",emoji:"🛋️",name:"共用部充実型",desc:"ラウンジ重視。リピート率が高い。",init:3400,beds:30,rent:140,baseOcc:0.5,ceil:0.9,body:"linear-gradient(135deg,#c7d3c0,#9fb09a)"},
+      {id:"event",emoji:"🎪",name:"イベント連動型",desc:"近隣会場の催事で高単価が狙える。",init:4000,beds:42,rent:175,baseOcc:0.46,ceil:0.93,body:"linear-gradient(135deg,#d6c9b0,#b09e7e)"}]},
+  nara:{name:"地域モデル（奈良）",emoji:"🦌",unlock:6,desc:"低家賃(0.8万/坪)。平日は低単価高稼働で赤字回避、休日に大きく稼ぐ。インバウンド地方流入が増加中。",season:[1.05,1.1,0.9,1.15,1.25,1.0,1.1,1.18,1.08,0.95,0.82,0.95],occMul:0.78,ground:"#26331d",grid:[1,1,1,0,1,0],areas:["A","A","A","B","B","A"],
+    props:[{id:"local",emoji:"🏠",name:"低家賃物件",desc:"家賃が極めて安い。閑散期の赤字リスク小。",init:2600,beds:44,rent:70,baseOcc:0.38,ceil:0.92,body:"linear-gradient(135deg,#c2b896,#9a8d64)"},
+      {id:"concept",emoji:"📚",name:"コンセプト型",desc:"インバウンド向けの体験型。評判が伸びやすい。",init:3300,beds:36,rent:95,baseOcc:0.34,ceil:0.95,body:"linear-gradient(135deg,#cdbfae,#a89478)"}]}
+};
+const REGION_ORDER=["tokyo","motomachi","nara"];
+const VAR_RATE=0.25,STAFF_BASE=19,DOM_BONUS=0.04,STAFF_SHARE=0.45;
+const SEASON_NAME={3:"行楽期",4:"夏休み繁忙",8:"年末繁忙",10:"閑散期"};
+const INVESTS=[{id:"deco",ic:"🛋️",n:"内装リノベ",e:"評判+0.3 / 稼働天井+4%",cost:120,rep:0.3,ceil:0.04},
+  {id:"auto",ic:"🤖",n:"スマートロック&IoT",e:"人件費-30%",cost:90,staff:-0.3},
+  {id:"twin",ic:"🖥️",n:"デジタルツイン管理",e:"評判+0.2 / 全店波及",cost:160,repAll:0.2}];
+const RANKS=[{min:0,name:"見習い店長",stage:"第一段階：ライト層",medal:"🔰"},
+  {min:120,name:"一人前店長",stage:"第一段階：ライト層",medal:"🥉"},
+  {min:320,name:"エリアマネージャー",stage:"第二段階：上位プレイヤー",medal:"🥈"},
+  {min:650,name:"統括マネージャー",stage:"第二段階：上位プレイヤー",medal:"🥇"},
+  {min:1100,name:"実店舗オーナー",stage:"第三段階：オーナー権獲得",medal:"👑"}];
+const RIVALS=[{nm:"佐藤ホールディングス",av:"🦊",base:540,grow:18},{nm:"山本トラベル",av:"🐻",base:410,grow:14},{nm:"鈴木インベスト",av:"🦉",base:300,grow:11},{nm:"高橋ステイ",av:"🐰",base:180,grow:8}];
+const NEW_STORE_TOKENS=10000;
+
+let G;
+function fresh(){return{cash:3500,tokens:0,monthIdx:0,year:1,region:"tokyo",stores:[],sel:null,sideTab:"store",score:0,ended:false,unlocked:{tokyo:true,motomachi:false,nara:false}};}
+G=fresh();
+let lastRankName="見習い店長";
+
+function renderRegions(){
+  const el=document.getElementById('regions'); el.innerHTML="";
+  REGION_ORDER.forEach(rid=>{const r=REGIONS[rid],open=G.unlocked[rid];
+    const d=document.createElement('div');
+    d.className="rtab"+(G.region===rid?" active":"")+(open?"":" locked");
+    d.innerHTML=`<span class="em">${r.emoji}</span>${r.name.split("（")[0]}`+(open?"":`<span class="lk">★${r.unlock}店で解放</span>`);
+    d.onclick=()=>{if(!open){flashToast("bad","🔒 未解放",`合計${r.unlock}店舗で解放されます。`);return;} G.region=rid; G.sel=null; layoutGrid(); renderAll();};
+    el.appendChild(d);});
+}
+const grid=document.getElementById('grid');
+function curR(){return REGIONS[G.region];}
+function layoutGrid(){
+  const R=curR(); grid.innerHTML=""; const s=122,cols=3,rows=Math.ceil(R.grid.length/3);
+  R.grid.forEach((g,i)=>{const r=Math.floor(i/3),c=i%3;
+    const cell=document.createElement('div');
+    const built=G.stores.find(st=>st.region===G.region&&st.cellId===i);
+    cell.className="cell "+(g?(built?"built":"empty"):"locked");
+    cell.style.left=(c*s)+"px"; cell.style.top=(r*s)+"px";
+    cell.style.background=g?`linear-gradient(135deg,${R.ground},#16293f)`:"";
+    cell.dataset.id=i; cell.onclick=()=>onCell(i); grid.appendChild(cell);});
+  grid.style.width=(cols*s)+"px"; grid.style.height=(rows*s)+"px";
+  document.getElementById('region-desc').innerHTML=`<div class="rn">${R.emoji} ${R.name}</div><div class="rd">${R.desc}</div>`;
+  renderBuildings();
+}
+function onCell(i){const R=curR(); if(!R.grid[i]){flashToast("bad","🔒 区画外","ここには建てられません。");return;}
+  const st=G.stores.find(s=>s.region===G.region&&s.cellId===i); if(st) selectStore(st); else openBuild(i);}
+function predictOcc(s){const R=REGIONS[s.region],p=s.prop;
+  const extraCeil=s.invests.has("deco")?0.04:0;
+  const elasticity=1-clamp((s.price-3500)/9000,-0.25,0.6);
+  let occ=p.baseOcc*elasticity; occ+=(s.rep-3.5)*0.06; occ*=R.season[G.monthIdx]*R.occMul;
+  const ceil=Math.min(p.ceil+extraCeil,0.99);
+  const sa=G.stores.filter(x=>x.region===s.region&&x.area===s.area).length; if(sa>1) occ+=(sa-1)*DOM_BONUS;
+  return clamp(occ,0.05,ceil);}
+function storeMonthly(s){const occ=predictOcc(s); s.occ=occ; const p=s.prop;
+  const revenue=p.beds*occ*s.price*30/10000, variable=revenue*VAR_RATE, rent=p.rent;
+  let staff=STAFF_BASE; if(s.invests.has("auto")) staff*=0.7;
+  const sa=G.stores.filter(x=>x.region===s.region&&x.area===s.area).length; if(sa>1) staff*=STAFF_SHARE+(1-STAFF_SHARE)/sa;
+  return{revenue,variable,rent,staff,profit:revenue-variable-rent-staff,occ};}
+function allStores(){return G.stores;}
+function totalProfit(){return allStores().reduce((a,s)=>a+storeMonthly(s).profit,0);}
+function computeScore(){let s=0; allStores().forEach(st=>{const m=storeMonthly(st); s+=Math.max(0,m.profit)*0.4; s+=st.occ*40; s+=(st.rep-3)*20;}); s+=allStores().length*30; s+=G.tokens*0.05; return s;}
+function currentRank(){let r=RANKS[0]; RANKS.forEach(x=>{if(G.score>=x.min)r=x;}); return r;}
+function nextRank(){return RANKS.find(x=>x.min>G.score);}
+function renderStats(){
+  const c=document.getElementById('st-cash'); c.querySelector('.v').textContent=Fm(G.cash*10000); c.classList.toggle('neg',G.cash<0);
+  document.getElementById('st-tok').querySelector('.v').textContent=Math.round(G.tokens).toLocaleString();
+  document.getElementById('st-stores').textContent=allStores().length;
+  const tp=totalProfit();
+  document.getElementById('st-profit').innerHTML=allStores().length?`<span style="color:${tp>=0?'var(--green)':'var(--red)'}">${Fm(tp*10000)}</span>`:'¥0';
+  document.getElementById('st-rank').textContent=currentRank().name;
+  document.getElementById('turn').innerHTML=G.year+'年目 <b>'+MONTHS[G.monthIdx]+'</b>';
+}
+function renderBuildings(){
+  document.querySelectorAll('.cell').forEach(c=>{const i=+c.dataset.id;
+    const st=G.stores.find(s=>s.region===G.region&&s.cellId===i);
+    if(st){c.classList.remove('empty','locked'); c.classList.add('built');
+      c.classList.toggle('sel',G.sel&&G.sel.region===st.region&&G.sel.cellId===st.cellId);
+      if(!c.querySelector('.hostel')) c.innerHTML=buildingHTML(st);
+      const bar=c.querySelector('.occbar i'); if(bar) bar.style.width=Math.round(st.occ*100)+"%";
+      const wins=c.querySelectorAll('.win'),lit=Math.round(st.occ*wins.length); wins.forEach((w,idx)=>w.classList.toggle('on',idx<lit));}});
+}
+function buildingHTML(st){let w=""; for(let r=0;r<3;r++)for(let cc=0;cc<4;cc++) w+=`<span class="win" style="left:${10+cc*17}px;top:${9+r*16}px"></span>`;
+  return `<div class="hostel"><div class="tag">${st.prop.emoji} ${st.area}</div><div class="hbody" style="background:${st.prop.body}"><div class="roof"></div>${w}</div><div class="occbar"><i></i></div></div>`;}
+const modalBg=document.getElementById('modal-bg'),modal=document.getElementById('modal'); let buildTarget=null;
+function openBuild(i){buildTarget=i; const R=curR(),area=R.areas[i];
+  const sa=G.stores.filter(s=>s.region===G.region&&s.area===area).length;
+  const cards=R.props.map(p=>{const afford=G.cash>=p.init;
+    return `<div class="card ${afford?'':'bad'}" ${afford?`onclick="doBuild('${p.id}')"`:''}>${sa>0?`<div class="pill">${area} +ドミナント</div>`:''}<div class="emoji">${p.emoji}</div><div class="cn">${p.name}</div><div class="cd">${p.desc}</div><div class="stats2"><div><span>初期投資</span><b style="color:var(--gold2)">${Fm(p.init*10000)}</b></div><div><span>ベッド</span><b>${p.beds}</b></div><div><span>月家賃</span><b>${Fm(p.rent*10000)}</b></div><div><span>稼働天井</span><b>${Math.round(p.ceil*100)}%</b></div></div></div>`;}).join("");
+  modal.innerHTML=`<div class="modal-h"><div class="t">🏗️ ${R.emoji} ${area}地区に出店</div><div class="s">${sa>0?`この地区に既に${sa}店 → ドミナント効果で稼働・人件費が有利に。`:'物件タイプを選ぶ。地域ごとに最適戦略が違う。'}</div></div><div class="cards ${R.props.length===2?'two':''}">${cards}</div><div class="modal-f"><div class="note">💡 単価は出店後に毎月調整。家賃と人件費が固定費。稼働率×単価×ベッド数が売上。</div><button class="x" onclick="closeModal()">やめる</button></div>`;
+  modalBg.classList.add('show');}
+function closeModal(){modalBg.classList.remove('show');}
+modalBg.onclick=e=>{if(e.target===modalBg)closeModal();};
+window.doBuild=function(pid){const R=curR(),p=R.props.find(x=>x.id===pid); if(G.cash<p.init)return; G.cash-=p.init;
+  const st={region:G.region,cellId:buildTarget,prop:p,price:4000,rep:3.6,area:R.areas[buildTarget],invests:new Set(),occ:0};
+  G.stores.push(st); closeModal(); checkUnlocks();
+  document.getElementById('hint').innerHTML='<b>'+p.name+'</b>を出店！ 右で<b>単価</b>を調整しよう';
+  layoutGrid(); renderAll(); selectStore(st); spawnFloat(buildTarget,"-"+Fm(p.init*10000),"var(--red)");}
+function checkUnlocks(){const n=allStores().length;
+  REGION_ORDER.forEach(rid=>{if(!G.unlocked[rid]&&n>=REGIONS[rid].unlock){G.unlocked[rid]=true; flashToast("good","🗺️ 新エリア解放！",`${REGIONS[rid].name} が出店可能になりました。`);}});
+  renderRegions();}
+document.querySelectorAll('.stab').forEach(t=>t.onclick=()=>{G.sideTab=t.dataset.tab; document.querySelectorAll('.stab').forEach(x=>x.classList.toggle('active',x===t)); renderSide();});
+function selectStore(st){G.sel=st; G.sideTab="store"; document.querySelectorAll('.stab').forEach(x=>x.classList.toggle('active',x.dataset.tab==="store")); renderBuildings(); renderSide();}
+function renderSide(){const body=document.getElementById('side-body'); if(G.sideTab==="store")return renderStorePanel(body); if(G.sideTab==="token")return renderTokenPanel(body); if(G.sideTab==="rank")return renderRankPanel(body);}
+function renderStorePanel(body){
+  const s=G.sel&&G.stores.find(x=>x.region===G.sel.region&&x.cellId===G.sel.cellId);
+  if(!s){body.innerHTML='<div class="empty-msg"><span class="big">🏚️</span>空き地（＋）から<br>店舗を建てましょう。<br><br>地域ごとに最適な物件と<br>単価設定が違います。</div>'; return;}
+  const m=storeMonthly(s); const sa=G.stores.filter(x=>x.region===s.region&&x.area===s.area).length;
+  const invHTML=INVESTS.map(iv=>{const done=s.invests.has(iv.id),afford=G.cash>=iv.cost;
+    return `<div class="iv ${done?'done':''}" ${(!done&&afford)?`onclick="doInvest('${iv.id}')"`:''}><div class="ic">${iv.ic}</div><div class="tx"><div class="n">${iv.n}</div><div class="e">${iv.e}</div></div><div class="cost">${done?'導入済':Fm(iv.cost*10000)}</div></div>`;}).join("");
+  body.innerHTML=`<div class="det-name">${s.prop.emoji} ${s.prop.name}</div><div class="det-sub"><span class="badge">${REGIONS[s.region].emoji} ${s.area}地区</span><span class="badge">${s.prop.beds}bed</span>${sa>1?`<span class="badge g">ドミナント×${sa}</span>`:''}</div>
+    <div class="kpi-row"><div class="kpi"><div class="k">稼働率</div><div class="v ${s.occ>0.5?'g':s.occ>0.35?'gd':'r'}">${Math.round(s.occ*100)}%</div></div><div class="kpi"><div class="k">月売上</div><div class="v">${Fm(m.revenue*10000)}</div></div><div class="kpi"><div class="k">月利益</div><div class="v ${m.profit>=0?'g':'r'}">${Fm(m.profit*10000)}</div></div></div>
+    <div class="lab">1泊あたり単価</div><div class="price-disp"><span class="p" id="pp">${F(s.price)}</span><span class="u">/ bed・泊</span></div>
+    <input type="range" min="2000" max="9000" step="100" value="${s.price}" id="ps"><div class="occ-pred"><span>安い・埋まる</span><span>高い・利幅大</span></div>
+    <div class="meter"><i style="width:${Math.round(s.occ*100)}%"></i></div><div class="occ-pred" style="margin-top:7px"><span>予測稼働率</span><b id="op">${Math.round(s.occ*100)}%</b></div>
+    <div class="lab">設備投資（課金要素）</div><div class="invest">${invHTML}</div>
+    <div class="lab">収支内訳（月）</div><div style="font-size:12px;line-height:1.85;color:var(--mut)"><div style="display:flex;justify-content:space-between"><span>売上</span><b style="color:var(--ink)">${Fm(m.revenue*10000)}</b></div><div style="display:flex;justify-content:space-between"><span>− 変動費(25%)</span><b style="color:var(--ink)">${Fm(m.variable*10000)}</b></div><div style="display:flex;justify-content:space-between"><span>− 家賃</span><b style="color:var(--ink)">${Fm(m.rent*10000)}</b></div><div style="display:flex;justify-content:space-between"><span>− 人件費</span><b style="color:var(--ink)">${Fm(m.staff*10000)}</b></div><div style="display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:4px;padding-top:4px"><span style="color:var(--ink);font-weight:700">月利益</span><b style="color:${m.profit>=0?'var(--green)':'var(--red)'}">${Fm(m.profit*10000)}</b></div></div>`;
+  const sl=document.getElementById('ps');
+  sl.oninput=()=>{s.price=+sl.value; document.getElementById('pp').textContent=F(s.price); const mm=storeMonthly(s); document.getElementById('op').textContent=Math.round(mm.occ*100)+'%'; body.querySelector('.meter i').style.width=Math.round(mm.occ*100)+'%'; const k=body.querySelectorAll('.kpi .v'); k[0].textContent=Math.round(s.occ*100)+'%'; k[0].className='v '+(s.occ>0.5?'g':s.occ>0.35?'gd':'r'); k[1].textContent=Fm(mm.revenue*10000); k[2].textContent=Fm(mm.profit*10000); k[2].className='v '+(mm.profit>=0?'g':'r'); renderStats(); renderBuildings();};
+}
+window.doInvest=function(id){const s=G.sel&&G.stores.find(x=>x.region===G.sel.region&&x.cellId===G.sel.cellId); if(!s)return;
+  const iv=INVESTS.find(x=>x.id===id); if(G.cash<iv.cost||s.invests.has(id))return; G.cash-=iv.cost; s.invests.add(id);
+  if(iv.rep) s.rep=clamp(s.rep+iv.rep,1,5); if(iv.repAll) allStores().forEach(x=>x.rep=clamp(x.rep+iv.repAll,1,5));
+  spawnFloat(s.cellId,"-"+Fm(iv.cost*10000),"var(--red)"); flashToast("good","✅ "+iv.n+" 導入","効果が反映されました。"); renderAll(); renderSide();}
+function renderTokenPanel(body){const canOpen=G.tokens>=NEW_STORE_TOKENS,pct=clamp(G.tokens/NEW_STORE_TOKENS*100,0,100);
+  body.innerHTML=`<div class="tok-hero"><div class="lbl">保有トークン</div><div class="amt">${Math.round(G.tokens).toLocaleString()}</div><div class="sub">運営の貢献（利益・稼働・評判）に応じて<br>毎月トークンが貯まります。<br><b style="color:var(--teal)">ゲーム内通貨</b>として完結し、現金化はできません。</div></div>
+    <div class="prog-wrap"><div class="prog-lab"><span>新店舗開業まで</span><span>${Math.round(G.tokens).toLocaleString()} / ${NEW_STORE_TOKENS.toLocaleString()}</span></div><div class="prog"><i style="width:${pct}%"></i></div></div>
+    <div class="tok-act"><div class="n">🏗️ 1万トークンで新店舗開業</div><div class="d">蓄積したトークンを次の拠点の開業資金に充当。資料の「トークン経済圏の循環」をゲーム内で再現。</div><button class="tok-btn" ${canOpen?'':'disabled'} onclick="tokenOpenStore()">${canOpen?'トークンで開業資金を獲得（+¥3,000万）':'トークンが不足しています'}</button></div>
+    <div class="tok-act"><div class="n">⚡ トークン → 設備投資</div><div class="d">3,000トークンを設備投資の資金に変換（+¥300万）。</div><button class="tok-btn" ${G.tokens>=3000?'':'disabled'} onclick="tokenToCash()">${G.tokens>=3000?'3,000トークンを資金化':'3,000トークン必要'}</button></div>
+    <div class="lab">トークンの貯まり方</div><div style="font-size:11.5px;color:var(--mut);line-height:1.7">・黒字運営：利益に応じて毎月付与<br>・高稼働（50%超）：ボーナス<br>・高評判（★4以上）：ボーナス<br>・実際の売上に連動して変動（資料の設計）</div>`;}
+window.tokenOpenStore=function(){if(G.tokens<NEW_STORE_TOKENS)return; G.tokens-=NEW_STORE_TOKENS; G.cash+=3000; flashToast("tok","🏗️ トークンで開業資金獲得","+¥3,000万。新しい空き地に出店できます。"); renderAll(); renderSide();}
+window.tokenToCash=function(){if(G.tokens<3000)return; G.tokens-=3000; G.cash+=300; flashToast("tok","⚡ トークンを資金化","+¥300万。"); renderAll(); renderSide();}
+function awardTokens(){let t=0; allStores().forEach(s=>{const m=storeMonthly(s); if(m.profit>0)t+=m.profit*8; if(s.occ>0.5)t+=120; if(s.rep>=4)t+=80;}); if(t>0)G.tokens+=t; return t;}
+function renderRankPanel(body){const rk=currentRank(),nx=nextRank();
+  const prevMin=rk.min,nextMin=nx?nx.min:rk.min+1,pct=nx?clamp((G.score-prevMin)/(nextMin-prevMin)*100,0,100):100;
+  const monthsPlayed=(G.year-1)*12+G.monthIdx;
+  const board=RIVALS.map(r=>({nm:r.nm,av:r.av,sc:r.base+r.grow*monthsPlayed})).concat([{nm:"あなた（自社）",av:"⭐",sc:G.score,you:true}]); board.sort((a,b)=>b.sc-a.sc);
+  const rows=board.map((b,i)=>`<div class="lead-row ${b.you?'you':''}"><div class="rk">${i+1}</div><div class="av">${b.av}</div><div class="nm">${b.nm}</div><div class="sc">${Math.round(b.sc)}</div></div>`).join("");
+  body.innerHTML=`<div class="rank-hero"><div class="rank-medal">${rk.medal}</div><div class="rank-name">${rk.name}</div><div class="rank-stage">${rk.stage}</div></div>
+    <div class="score-big">${Math.round(G.score)} <span style="font-size:13px;color:var(--mut)">pt</span></div>
+    <div class="prog-wrap"><div class="prog-lab"><span>${nx?'次：'+nx.name:'最高ランク到達'}</span><span>${nx?Math.round(G.score)+' / '+nextMin:'MAX'}</span></div><div class="prog"><i style="width:${pct}%"></i></div></div>
+    ${rk.medal==="👑"?'<div style="background:linear-gradient(135deg,#3a2e12,#14283f);border:1px solid var(--gold);border-radius:12px;padding:12px;font-size:12px;line-height:1.6;margin:10px 0"><b style="color:var(--gold2)">👑 オーナー権獲得！</b><br>優秀な成績を収め、実店舗の運営権が付与される段階に到達（資料：第三段階）。</div>':''}
+    <div class="lab">店長ランキング（切磋琢磨）</div><div class="lead">${rows}</div>
+    <div style="font-size:11px;color:var(--mut);line-height:1.6;margin-top:10px">スコア＝利益・稼働率・評判・店舗数・トークンの合成。ライバル店長と競い上位を目指す。</div>`;}
+let toastTimer=null;
+function flashToast(kind,title,desc){const t=document.getElementById('toast'); t.className='toast '+kind; t.querySelector('.t').textContent=title; t.querySelector('.d').textContent=desc; void t.offsetWidth; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3400);}
+function spawnFloat(cellId,txt,color){const cell=document.querySelector(`.cell[data-id="${cellId}"]`); if(!cell)return; const r=cell.getBoundingClientRect(); const f=document.createElement('div'); f.className='float'; f.textContent=txt; f.style.color=color; f.style.left=(r.left+r.width/2-20)+'px'; f.style.top=r.top+'px'; document.body.appendChild(f); setTimeout(()=>f.remove(),1500);}
+const EVENTS=[{t:"☀️ 近隣で大型イベント",d:"周辺ホテルが満室。評判と稼働が押し上げられた。",k:"good",rep:0.25},{t:"📉 競合が新規オープン",d:"価格競争で稼働がやや低下。",k:"bad",rep:-0.18},{t:"⭐ 口コミがバズった",d:"清掃と接客の評判がSNSで拡散。",k:"good",rep:0.4},{t:"🔧 設備トラブル",d:"給湯器が故障。修繕費が発生。",k:"bad",cash:-45},{t:"💴 インバウンド好調",d:"円安で訪日客が増加。全店の評判が上昇。",k:"good",rep:0.2},{t:"🎪 イベント連動需要",d:"近隣会場の催事で高単価が通った。",k:"good",cash:60}];
+function applyEvent(e){if(e.rep)allStores().forEach(s=>s.rep=clamp(s.rep+e.rep,1,5)); if(e.cash)G.cash+=e.cash; flashToast(e.k,e.t,e.d);}
+function nextMonth(){if(G.ended){restart();return;} if(allStores().length===0){flashToast("bad","まず出店しよう","空き地をタップして1号店を建ててください。");return;}
+  const tp=totalProfit(); G.cash+=tp; const gainedT=awardTokens();
+  G.stores.filter(s=>s.region===G.region).forEach(s=>{const m=storeMonthly(s); spawnFloat(s.cellId,(m.profit>=0?"+":"")+Fm(m.profit*10000),m.profit>=0?"var(--green)":"var(--red)");});
+  G.monthIdx++; if(G.monthIdx>=12){G.monthIdx=0;G.year++;yearReport();}
+  if(Math.random()<0.4){applyEvent(EVENTS[Math.floor(Math.random()*EVENTS.length)]);}
+  else if(SEASON_NAME[G.monthIdx]){const up=curR().season[G.monthIdx]>=1.1; flashToast(up?"good":"bad",(up?"🔥 ":"❄️ ")+SEASON_NAME[G.monthIdx],up?"季節需要で稼働が上振れ。単価を上げる好機。":"閑散期。単価を下げて稼働を確保しよう。");}
+  G.score=computeScore();
+  if(G.cash<-300){gameOver();return;}
+  renderAll();
+  if(gainedT>0&&Math.random()<0.5) flashToast("tok","🪙 トークン獲得","+"+Math.round(gainedT).toLocaleString()+" トークン（運営貢献）");
+  if(G.sel) selectStore(G.sel); else renderSide();}
+function checkRankUp(){const r=currentRank(); if(r.name!==lastRankName){lastRankName=r.name; flashToast("good",r.medal+" 昇格！",r.name+"（"+r.stage+"）に到達しました。");}}
+function yearReport(){const annual=allStores().reduce((a,s)=>a+storeMonthly(s).profit*12,0),invested=allStores().reduce((a,s)=>a+s.prop.init,0),yld=invested?annual/invested*100:0,occAvg=allStores().length?Math.round(allStores().reduce((a,s)=>a+s.occ,0)/allStores().length*100):0;
+  modal.innerHTML=`<div class="report"><div class="ttl"><span class="yr">${G.year-1}年目</span> 決算</div><div class="rep-rows"><div class="rep-row"><span>店舗数</span><span class="v">${allStores().length}店</span></div><div class="rep-row"><span>想定年間利益</span><span class="v" style="color:var(--gold2)">${Fm(annual*10000)}</span></div><div class="rep-row"><span>保有トークン</span><span class="v" style="color:var(--teal)">${Math.round(G.tokens).toLocaleString()}</span></div><div class="rep-row"><span>平均稼働率</span><span class="v">${occAvg}%</span></div><div class="rep-row tot"><span>年換算 利回り</span><span class="v ${yld>=15?'g':'r'}">${yld.toFixed(1)}%</span></div></div><div class="modal-f" style="justify-content:center;padding-bottom:20px"><button class="btn btn-next" onclick="closeModal()" style="padding:11px 38px">${G.year}年目へ ▶</button></div><div style="font-size:11px;color:var(--mut);padding:0 28px 18px;line-height:1.5">${yld>=27?'🏆 都内コアモデル水準（27%）達成！':yld>=15?'👍 撤退ライン15%クリア。堅実経営。':'⚠️ 利回り15%未満。単価とドミナントを見直そう。'}</div></div>`;
+  modalBg.classList.add('show');}
+function gameOver(){G.ended=true; modal.innerHTML=`<div class="report"><div class="ttl" style="color:var(--red)">💀 資金ショート</div><div style="padding:10px 28px 6px;color:var(--mut);font-size:14px;line-height:1.7">赤字が続き資金が尽きました。<br><b style="color:var(--ink)">稼働を埋める価格設定</b>と<b style="color:var(--ink)">ドミナント出店</b>で立て直しを。</div><div class="modal-f" style="justify-content:center;padding:18px 24px 24px"><button class="btn btn-next" onclick="restart()" style="padding:11px 38px">もう一度 ▶</button></div></div>`; modalBg.classList.add('show');}
+window.restart=function(){G=fresh(); lastRankName="見習い店長"; closeModal(); renderRegions(); layoutGrid(); document.getElementById('hint').innerHTML='空き地を<b>タップ</b>して1号店を建てよう'; renderAll(); renderSide();}
+function renderAll(){renderStats(); checkRankUp(); renderBuildings();}
+document.getElementById('next').onclick=nextMonth;
+renderRegions(); layoutGrid(); renderAll(); renderSide();
+flashToast("good","🏨 bnb+ TYCOON v2","東京で稼ぐ→トークンを貯める→元町・奈良へ展開→ランキング上位とオーナー権を目指そう。");
+</script>
+</body>
+</html>
