@@ -393,8 +393,14 @@
 
   <!-- Sheet links -->
   <div class="section-title">📋 シートを開いて編集</div>
-  <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
-    URLが設定済みの場合はボタンからシートを直接開けます。未設定の場合はボタンが無効です。
+  <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px">
+    7カテゴリのスプレッドシートは作成済みです（サンプルデータ入り）。下のボタンから直接開いて編集できます。
+  </p>
+  <p style="margin-bottom:14px">
+    <a href="https://drive.google.com/drive/folders/1GZPMDpN8wtC1zxGTlJVGfcJTR36A8-Q7" target="_blank"
+       style="font-size:13px;font-weight:700;color:var(--accent);text-decoration:none">
+      📁 データフォルダをまとめて開く ↗
+    </a>
   </p>
 
   <div class="sheet-grid" id="sheet-grid">
@@ -556,29 +562,24 @@
   // Dynamically read CATEGORIES from dashboard to show current status
   // Since this is a separate file, we just show static links
   const SHEET_CATEGORIES = [
-    { id: "properties", name: "物件候補地",         icon: "🏢" },
-    { id: "ma",         name: "M&A案件",             icon: "🤝" },
-    { id: "trailer",    name: "トレーラー・サウナ",   icon: "🔥" },
-    { id: "minpaku",    name: "現所有物件の民泊情報", icon: "🏠" },
-    { id: "competitor", name: "競合・マーケット調査", icon: "📊" },
-    { id: "vendors",    name: "業者・外注管理",       icon: "🔧" },
-    { id: "legal",      name: "許認可・法務進捗",     icon: "📋" },
+    { name: "物件候補地",              icon: "🏢", editUrl: "https://docs.google.com/spreadsheets/d/1m49WB1_2ZlNITFBO359xGPN5B4iIHLUtSHPZPmvvE5I/edit" },
+    { name: "M&A案件",                 icon: "🤝", editUrl: "https://docs.google.com/spreadsheets/d/18b9Wkx--Ju_I__Abavzpt4igJFwQGTUMxpG3pv6VpzM/edit" },
+    { name: "トレーラー・サウナ価格比較", icon: "🔥", editUrl: "https://docs.google.com/spreadsheets/d/12M9r9Xw9UTfFFzTITcVp0ZTkqajRtCI8ViCJ0PCE3Ng/edit" },
+    { name: "現所有物件の民泊情報",     icon: "🏠", editUrl: "https://docs.google.com/spreadsheets/d/1sRmyiuzmiCeR3Gb7oUX5epf2y7fXDpzs68IByUHBni8/edit" },
+    { name: "競合・マーケット調査",     icon: "📊", editUrl: "https://docs.google.com/spreadsheets/d/1qcB_aNElCVz-wGLxz-pgMNCheIrdOrak8x6Im9wHQbs/edit" },
+    { name: "業者・外注管理",           icon: "🔧", editUrl: "https://docs.google.com/spreadsheets/d/1i0moUJ9mWRr5NXgGCdZXuzXiVjwzIahyKyZabxZ9nkQ/edit" },
+    { name: "許認可・法務進捗",         icon: "📋", editUrl: "https://docs.google.com/spreadsheets/d/1DrfffPg1duXuAM1Yr4mt6qg2lWgkNkYmSImQBIK2qSs/edit" },
   ];
 
   const grid = document.getElementById('sheet-grid');
   SHEET_CATEGORIES.forEach(cat => {
-    // In production, sheetUrls come from the dashboard CONFIG
-    // Here we just show open buttons with placeholder
     grid.innerHTML += `
       <div class="sheet-item">
         <div class="sheet-left">
           <span class="sheet-icon">${cat.icon}</span>
-          <div>
-            <div class="sheet-name">${cat.name}</div>
-            <div class="url-code">未設定 — dashboard-biz2025.html の sheetUrl に入力してください</div>
-          </div>
+          <div class="sheet-name">${cat.name}</div>
         </div>
-        <span class="badge status-sample" style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap">未設定</span>
+        <a class="sheet-btn" href="${cat.editUrl}" target="_blank" rel="noopener">📝 開いて編集 ↗</a>
       </div>`;
   });
 </script>
