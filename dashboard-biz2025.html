@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>案件ダッシュボード — AP Company</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #f7f8fa;
+      --surface:     #ffffff;
+      --surface-2:   #f0f2f6;
+      --border:      #e0e5ed;
+      --text:        #1a1f2e;
+      --text-muted:  #8691a8;
+      --accent:      #1a56db;
+      --accent-soft: #eff4ff;
+      --green:       #0d9467;
+      --green-soft:  #d1fae5;
+      --amber:       #b45309;
+      --amber-soft:  #fef3c7;
+      --red:         #c0392b;
+      --red-soft:    #fde8e8;
+      --gray-soft:   #f1f5f9;
+      --gray-text:   #64748b;
+      --radius:      10px;
+      --radius-sm:   7px;
+      --font:        'Noto Sans JP', sans-serif;
+      --font-disp:   'Outfit', sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px 8px;
+      gap: 12px;
+    }
+
+    .logo-wrap { display: flex; flex-direction: column; }
+
+    .logo-text {
+      font-family: var(--font-disp);
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .logo-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1px;
+      flex-shrink: 0;
+    }
+
+    .total-count {
+      font-family: var(--font-disp);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--accent);
+    }
+
+    .last-update {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* ── SEARCH ── */
+    .search-wrap {
+      padding: 0 16px 10px;
+    }
+
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 13px;
+      font-size: 15px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #search-input {
+      width: 100%;
+      padding: 10px 38px 10px 40px;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      font-family: var(--font);
+      font-size: 14px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+      -webkit-appearance: none;
+    }
+
+    #search-input::placeholder { color: var(--text-muted); }
+
+    #search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(26,86,219,0.12);
+      background: var(--surface);
+    }
+
+    #search-clear {
+      position: absolute;
+      right: 10px;
+      background: var(--text-muted);
+      color: #fff;
+      border: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #search-clear.hidden { display: none; }
+
+    /* ── CATEGORY TABS ── */
+    .cat-tabs {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 0 16px 12px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .cat-tabs::-webkit-scrollbar { display: none; }
+
+    .cat-tab {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 13px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .cat-tab:hover { border-color: var(--accent); color: var(--accent); }
+
+    .cat-tab.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .cat-tab .tab-count {
+      font-family: var(--font-disp);
+      font-weight: 700;
+      font-size: 11px;
+      background: rgba(255,255,255,0.25);
+      padding: 1px 6px;
+      border-radius: 999px;
+    }
+
+    .cat-tab:not(.active) .tab-count {
+      background: var(--surface-2);
+      color: var(--text-muted);
+    }
+
+    /* ── MAIN ── */
+    main {
+      padding: 10px 14px 80px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* ── SAMPLE BANNER ── */
+    .sample-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 16px;
+      background: var(--amber-soft);
+      border: 1px solid #fde68a;
+      border-radius: var(--radius);
+      font-size: 13px;
+      color: var(--amber);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .sample-banner strong { font-weight: 700; display: block; margin-bottom: 2px; }
+
+    /* ── ACCORDION ── */
+    .cat-section {
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .cat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.1s;
+    }
+
+    .cat-header:hover { background: var(--surface-2); }
+
+    .cat-icon { font-size: 20px; flex-shrink: 0; line-height: 1; }
+
+    .cat-name {
+      font-family: var(--font-disp);
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .cat-badge {
+      font-family: var(--font-disp);
+      font-weight: 700;
+      font-size: 12px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 2px 9px;
+      border-radius: 999px;
+    }
+
+    .cat-chevron {
+      color: var(--text-muted);
+      font-size: 12px;
+      transition: transform 0.22s;
+      flex-shrink: 0;
+    }
+
+    .cat-section.open .cat-chevron { transform: rotate(180deg); }
+
+    .cat-body { display: none; padding: 2px 12px 14px; }
+    .cat-section.open .cat-body { display: block; }
+
+    /* ── CARD GRID ── */
+    .cards-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    @media (min-width: 580px) {
+      .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 860px) {
+      .cards-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* ── CARD ── */
+    .card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 13px 14px;
+      cursor: pointer;
+      background: var(--surface);
+      transition: box-shadow 0.15s, border-color 0.15s, transform 0.1s;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 14px rgba(0,0,0,0.09);
+      border-color: #c5cfe0;
+      transform: translateY(-1px);
+    }
+
+    .card:active { transform: translateY(0); }
+
+    .card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 3px;
+    }
+
+    .card-title {
+      font-family: var(--font-disp);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.35;
+      flex: 1;
+      word-break: break-all;
+    }
+
+    .card-title a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .card-title a:hover { text-decoration: underline; }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 9px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .card-fields {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      margin-bottom: 9px;
+    }
+
+    .cf-item { display: flex; flex-direction: column; gap: 0; }
+
+    .cf-label {
+      font-size: 9px;
+      color: var(--text-muted);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .cf-val {
+      font-family: var(--font-disp);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    /* ── STATUS BADGE ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── LINK CHIPS ── */
+    .link-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .link-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: background 0.12s;
+    }
+
+    .link-chip:hover { background: #dce8ff; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* ── SEARCH RESULTS VIEW ── */
+    #search-view { display: none; }
+    #search-view.active { display: block; }
+
+    .search-result-group { margin-bottom: 20px; }
+
+    .search-group-hd {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 0 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .search-hd {
+      padding: 12px 0 6px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .no-results-icon { font-size: 44px; margin-bottom: 12px; }
+
+    /* ── MODAL ── */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.48);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      backdrop-filter: blur(3px);
+      transition: opacity 0.25s;
+    }
+
+    .modal-backdrop.active { opacity: 1; pointer-events: auto; }
+
+    .modal-panel {
+      position: fixed;
+      z-index: 201;
+      background: var(--surface);
+      overflow-y: auto;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 92dvh;
+      border-radius: 20px 20px 0 0;
+      padding: 0 20px 48px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+    }
+
+    .modal-panel.active { transform: translateY(0); }
+
+    @media (min-width: 640px) {
+      .modal-panel {
+        top: 50%;
+        left: 50%;
+        right: auto;
+        bottom: auto;
+        width: min(600px, calc(100vw - 40px));
+        max-height: 88dvh;
+        border-radius: 16px;
+        padding: 0 28px 36px;
+        transform: translate(-50%, -46%);
+        opacity: 0;
+        transition: transform 0.25s cubic-bezier(0.32,0.72,0,1), opacity 0.25s;
+      }
+
+      .modal-panel.active {
+        transform: translate(-50%, -50%);
+        opacity: 1;
+      }
+    }
+
+    .modal-sticky-top {
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      padding-top: 14px;
+      padding-bottom: 10px;
+      z-index: 1;
+    }
+
+    .modal-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 999px;
+      margin: 0 auto 14px;
+    }
+
+    @media (min-width: 640px) { .modal-handle { display: none; } }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 14px;
+      right: 0;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.12s;
+    }
+
+    .modal-close-btn:hover { background: var(--surface-2); }
+
+    .modal-cat-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .modal-title {
+      font-family: var(--font-disp);
+      font-weight: 800;
+      font-size: 22px;
+      color: var(--text);
+      line-height: 1.3;
+      margin-bottom: 4px;
+      word-break: break-all;
+    }
+
+    .modal-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .modal-divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+    .modal-fields { display: flex; flex-direction: column; gap: 13px; }
+
+    .mf-item { display: flex; flex-direction: column; gap: 2px; }
+
+    .mf-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .mf-val { font-size: 15px; color: var(--text); word-break: break-all; }
+
+    .modal-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .modal-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      padding: 10px 20px;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: opacity 0.12s;
+    }
+
+    .modal-link-btn:hover { opacity: 0.85; }
+
+    /* ── LOADING ── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: var(--surface);
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    #loading.hidden { display: none; }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #loading p { font-size: 14px; color: var(--text-muted); }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      z-index: 400;
+      transition: transform 0.3s;
+      white-space: nowrap;
+      max-width: calc(100vw - 40px);
+      text-align: center;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER
+  ============================================================ -->
+  <header>
+    <div class="header-top">
+      <div class="logo-wrap">
+        <span class="logo-text">案件ダッシュボード</span>
+        <span class="logo-sub">AP Company</span>
+      </div>
+      <div class="header-right">
+        <span class="total-count" id="total-count">読み込み中...</span>
+        <span class="last-update" id="last-update"></span>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="search" id="search-input"
+               placeholder="物件名・会社名・エリアなどで検索..."
+               autocomplete="off" spellcheck="false">
+        <button id="search-clear" class="hidden" aria-label="検索をクリア">✕</button>
+      </div>
+    </div>
+    <div class="cat-tabs" id="cat-tabs"></div>
+  </header>
+
+  <!-- ============================================================
+       MAIN
+  ============================================================ -->
+  <main>
+    <!-- Sample data banner (shown when Google Sheets not configured) -->
+    <div class="sample-banner" id="sample-banner" style="display:none">
+      <span>⚠️</span>
+      <div>
+        <strong>サンプルデータを表示しています</strong>
+        Google Sheetsの設定後、各カテゴリの <code>sheetUrl</code> にCSV URLを入力してください。
+        設定方法は <a href="admin-biz2025.html" target="_blank" style="color:var(--amber);font-weight:700">管理者ページ ↗</a> を参照。
+      </div>
+    </div>
+
+    <!-- Category accordion view -->
+    <div id="categories-view"></div>
+
+    <!-- Search results view -->
+    <div id="search-view">
+      <div class="search-hd" id="search-hd"></div>
+      <div id="search-results"></div>
+    </div>
+  </main>
+
+  <!-- ============================================================
+       MODAL
+  ============================================================ -->
+  <div class="modal-backdrop" id="modal-backdrop" onclick="closeModal()"></div>
+  <div class="modal-panel" id="modal-panel">
+    <div class="modal-sticky-top">
+      <div class="modal-handle"></div>
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+
+  <!-- ============================================================
+       LOADING
+  ============================================================ -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>データを読み込んでいます...</p>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ============================================================
+       SCRIPT
+  ============================================================ -->
+  <script>
+  // ============================================================
+  //  ★ CATEGORIES CONFIG ★
+  //  新しいカテゴリを追加するには、このオブジェクトをCATEGORIESに追加してください。
+  //  sheetUrl: Google Sheetsで「ファイル → 共有 → ウェブに公開」から取得したCSV URLを貼り付けてください。
+  //  空のままにするとsampleDataが表示されます。
+  // ============================================================
+  const CATEGORIES = [
+    {
+      id: "properties",
+      name: "物件候補地",
+      icon: "🏢",
+      sheetUrl: "",  // 例: "https://docs.google.com/spreadsheets/d/xxxxx/export?format=csv&gid=0"
+      titleColumn: "物件名",
+      subtitleColumn: "住所",
+      statusColumn: "ステータス",
+      titleLinkColumn: "",
+      cardFields: [
+        { label: "価格帯",  column: "価格帯" },
+        { label: "利回り",  column: "利回り" },
+        { label: "面積",    column: "面積" },
+      ],
+      linkDefs: [
+        { column: "GoogleMaps URL", label: "地図",  icon: "📍" },
+        { column: "資料URL",        label: "資料",  icon: "📄" },
+      ],
+      sampleData: [
+        {
+          "物件名": "渋谷区恵比寿マンション",
+          "住所": "東京都渋谷区恵比寿2丁目",
+          "価格帯": "3.2億円", "利回り": "5.2%", "面積": "250㎡",
+          "ステータス": "検討中", "GoogleMaps URL": "", "資料URL": "",
+          "備考": "駅徒歩5分。1Fに飲食テナントあり。民泊転用検討中。"
+        },
+        {
+          "物件名": "京都市下京区町家",
+          "住所": "京都府京都市下京区",
+          "価格帯": "8,500万円", "利回り": "4.8%", "面積": "180㎡",
+          "ステータス": "交渉中", "GoogleMaps URL": "", "資料URL": "",
+          "備考": "築70年・改装済。外国人観光客需要高。"
+        },
+        {
+          "物件名": "大阪市北区ビル",
+          "住所": "大阪府大阪市北区曽根崎",
+          "価格帯": "5.1億円", "利回り": "6.1%", "面積": "420㎡",
+          "ステータス": "見送り", "GoogleMaps URL": "", "資料URL": "",
+          "備考": "耐震補強工事が必要。コスト試算要。"
+        }
+      ]
+    },
+    {
+      id: "ma",
+      name: "M&A案件",
+      icon: "🤝",
+      sheetUrl: "",
+      titleColumn: "会社名",
+      subtitleColumn: "業種",
+      statusColumn: "ステータス",
+      titleLinkColumn: "会社URL",
+      cardFields: [
+        { label: "売上規模", column: "売上規模" },
+        { label: "価格感",   column: "価格感" },
+        { label: "担当者",   column: "担当者" },
+      ],
+      linkDefs: [
+        { column: "会社URL", label: "会社HP", icon: "🌐" },
+        { column: "資料URL", label: "資料",   icon: "📄" },
+      ],
+      sampleData: [
+        {
+          "会社名": "株式会社山田ホテルズ",
+          "業種": "旅館・ホテル業",
+          "売上規模": "年商3億円", "価格感": "2億円",
+          "会社URL": "", "担当者": "FA: 鈴木FAS",
+          "ステータス": "交渉中", "資料URL": "",
+          "備考": "創業50年。3物件保有。オーナー高齢により売却希望。"
+        },
+        {
+          "会社名": "合同会社クリーンプロ",
+          "業種": "建物清掃・管理業",
+          "売上規模": "年商8,000万円", "価格感": "5,000万円",
+          "会社URL": "", "担当者": "田中顧問",
+          "ステータス": "検討中", "資料URL": "",
+          "備考": "既存民泊への清掃提供元。シナジーあり。"
+        }
+      ]
+    },
+    {
+      id: "trailer",
+      name: "トレーラー・サウナ価格比較",
+      icon: "🔥",
+      sheetUrl: "",
+      titleColumn: "メーカー",
+      subtitleColumn: "モデル",
+      statusColumn: "",
+      titleLinkColumn: "公式URL",
+      cardFields: [
+        { label: "定価",     column: "定価" },
+        { label: "実勢価格", column: "実勢価格" },
+        { label: "定員",     column: "定員" },
+      ],
+      linkDefs: [
+        { column: "公式URL", label: "公式HP", icon: "🌐" },
+      ],
+      sampleData: [
+        {
+          "メーカー": "サウナスタジオ", "モデル": "バレルサウナ S-200",
+          "定価": "180万円", "実勢価格": "160万円", "定員": "4〜6名",
+          "公式URL": "", "特徴": "国産ヒノキ使用。組立式で搬入容易。", "備考": "納期3ヶ月"
+        },
+        {
+          "メーカー": "フィンランドサウナ", "モデル": "モバイルサウナ Pro",
+          "定価": "250万円", "実勢価格": "220万円", "定員": "6〜8名",
+          "公式URL": "", "特徴": "フィンランド直輸入。ロウリュ対応。", "備考": "納期2ヶ月"
+        },
+        {
+          "メーカー": "コンテナサウナ社", "モデル": "CS-400 コンテナ型",
+          "定価": "380万円", "実勢価格": "350万円", "定員": "8〜10名",
+          "公式URL": "", "特徴": "移動式コンテナ。大型イベント対応。", "備考": "納期4〜5ヶ月"
+        }
+      ]
+    },
+    {
+      id: "minpaku",
+      name: "現所有物件の民泊情報",
+      icon: "🏠",
+      sheetUrl: "",
+      titleColumn: "物件名",
+      subtitleColumn: "エリア",
+      statusColumn: "稼働状況",
+      titleLinkColumn: "",
+      cardFields: [
+        { label: "月間収益目安", column: "月間収益目安" },
+        { label: "稼働率",      column: "稼働率" },
+      ],
+      linkDefs: [
+        { column: "Airbnb URL",    label: "Airbnb",    icon: "🏡" },
+        { column: "Instagram URL", label: "Instagram", icon: "📷" },
+        { column: "GoogleMaps URL",label: "地図",      icon: "📍" },
+      ],
+      sampleData: [
+        {
+          "物件名": "○○荘 別館", "エリア": "東京都渋谷区",
+          "Airbnb URL": "", "Instagram URL": "", "GoogleMaps URL": "",
+          "月間収益目安": "45万円", "稼働率": "76%",
+          "稼働状況": "稼働中", "備考": "Airbnb評価4.8。週末はほぼ満室。"
+        },
+        {
+          "物件名": "△△ハウス", "エリア": "京都府京都市",
+          "Airbnb URL": "", "Instagram URL": "", "GoogleMaps URL": "",
+          "月間収益目安": "32万円", "稼働率": "62%",
+          "稼働状況": "稼働中", "備考": "外国人ゲスト多。清掃コスト高め。"
+        }
+      ]
+    },
+    {
+      id: "competitor",
+      name: "競合・マーケット調査",
+      icon: "📊",
+      sheetUrl: "",
+      titleColumn: "エリア",
+      subtitleColumn: "調査日",
+      statusColumn: "",
+      titleLinkColumn: "",
+      cardFields: [
+        { label: "競合物件名",  column: "競合物件名" },
+        { label: "平均単価",    column: "平均単価" },
+        { label: "稼働率目安",  column: "稼働率目安" },
+      ],
+      linkDefs: [
+        { column: "参考URL", label: "参考リンク", icon: "🔗" },
+      ],
+      sampleData: [
+        {
+          "エリア": "渋谷・恵比寿エリア",
+          "競合物件名": "EBISUステイ / 代官山ハウス 等",
+          "平均単価": "¥15,000/泊", "稼働率目安": "72%",
+          "参考URL": "", "調査日": "2025-06-01",
+          "備考": "外資系ホテル進出が増加傾向。差別化必要。"
+        },
+        {
+          "エリア": "京都東山エリア",
+          "競合物件名": "祇園町家ステイ / 東山庵 等",
+          "平均単価": "¥18,000/泊", "稼働率目安": "78%",
+          "参考URL": "", "調査日": "2025-05-15",
+          "備考": "インバウンド需要旺盛。春・秋は特に高稼働。"
+        }
+      ]
+    },
+    {
+      id: "vendors",
+      name: "業者・外注管理",
+      icon: "🔧",
+      sheetUrl: "",
+      titleColumn: "会社名",
+      subtitleColumn: "業種",
+      statusColumn: "評価",
+      titleLinkColumn: "",
+      cardFields: [
+        { label: "担当者",   column: "担当者" },
+        { label: "単価目安", column: "単価目安" },
+        { label: "連絡先",   column: "連絡先" },
+      ],
+      linkDefs: [],
+      sampleData: [
+        {
+          "会社名": "○○クリーニングサービス", "業種": "清掃",
+          "担当者": "田中一郎", "連絡先": "03-XXXX-XXXX",
+          "単価目安": "¥8,000/回", "評価": "★★★★",
+          "備考": "定期契約あり。急な依頼も対応可能。"
+        },
+        {
+          "会社名": "△△電気設備", "業種": "電気・修繕",
+          "担当者": "鈴木次郎", "連絡先": "090-XXXX-XXXX",
+          "単価目安": "応相談", "評価": "★★★★★",
+          "備考": "24時間対応。信頼度高い。"
+        }
+      ]
+    },
+    {
+      id: "legal",
+      name: "許認可・法務進捗",
+      icon: "📋",
+      sheetUrl: "",
+      titleColumn: "物件名",
+      subtitleColumn: "申請種別",
+      statusColumn: "ステータス",
+      titleLinkColumn: "",
+      cardFields: [
+        { label: "申請種別",  column: "申請種別" },
+        { label: "期限",      column: "期限" },
+        { label: "担当窓口",  column: "担当窓口" },
+      ],
+      linkDefs: [
+        { column: "書類URL", label: "書類", icon: "📄" },
+      ],
+      sampleData: [
+        {
+          "物件名": "○○荘 別館", "申請種別": "住宅宿泊事業届出（民泊）",
+          "ステータス": "取得済", "期限": "2027-01-14",
+          "担当窓口": "渋谷区保健所", "書類URL": "",
+          "備考": "更新は2年ごと。次回更新日に注意。"
+        },
+        {
+          "物件名": "△△ハウス", "申請種別": "消防設備点検",
+          "ステータス": "申請中", "期限": "2025-09-30",
+          "担当窓口": "○○消防署", "書類URL": "",
+          "備考": "スプリンクラー設置確認が必要。"
+        }
+      ]
+    }
+  ];
+
+  // ============================================================
+  //  ステータスバッジカラー
+  // ============================================================
+  const STATUS_COLORS = {
+    "検討中":   { bg: "#fef3c7", text: "#b45309" },
+    "交渉中":   { bg: "#eff4ff", text: "#1a56db" },
+    "進行中":   { bg: "#eff4ff", text: "#1a56db" },
+    "申請中":   { bg: "#fef3c7", text: "#b45309" },
+    "契約済":   { bg: "#d1fae5", text: "#0d9467" },
+    "完了":     { bg: "#d1fae5", text: "#0d9467" },
+    "取得済":   { bg: "#d1fae5", text: "#0d9467" },
+    "稼働中":   { bg: "#d1fae5", text: "#0d9467" },
+    "見送り":   { bg: "#f1f5f9", text: "#64748b" },
+    "保留":     { bg: "#f1f5f9", text: "#64748b" },
+    "停止中":   { bg: "#f1f5f9", text: "#64748b" },
+    "要確認":   { bg: "#fde8e8", text: "#c0392b" },
+    "期限超過": { bg: "#fde8e8", text: "#c0392b" },
+    "★★★★★": { bg: "#d1fae5", text: "#0d9467" },
+    "★★★★":  { bg: "#eff4ff", text: "#1a56db" },
+    "★★★":   { bg: "#fef3c7", text: "#b45309" },
+  };
+
+  // ============================================================
+  //  State
+  // ============================================================
+  const allData = {};
+  let fuseIndex = null;
+  let searchDocs = [];
+  let currentModal = null;
+  let isSearchActive = false;
+
+  // ============================================================
+  //  CSV パーサー
+  // ============================================================
+  function parseCSVLine(line) {
+    const result = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') {
+        if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+      else cur += c;
+    }
+    result.push(cur);
+    return result;
+  }
+
+  function parseCSV(text) {
+    const lines = text.trim().split(/\r?\n/);
+    if (lines.length < 2) return [];
+    const headers = parseCSVLine(lines[0]).map(h => h.trim());
+    return lines.slice(1).filter(l => l.trim()).map(line => {
+      const vals = parseCSVLine(line);
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = (vals[i] || '').trim(); });
+      return obj;
+    });
+  }
+
+  // ============================================================
+  //  データ読み込み
+  // ============================================================
+  async function loadCategory(cat) {
+    if (!cat.sheetUrl) return { items: cat.sampleData || [], isSample: true };
+    try {
+      const res = await fetch(cat.sheetUrl);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      const items = parseCSV(text);
+      return { items, isSample: false };
+    } catch (e) {
+      console.warn(`[${cat.name}] Sheets fetch failed, using sample data:`, e.message);
+      return { items: cat.sampleData || [], isSample: true };
+    }
+  }
+
+  async function loadAll() {
+    const results = await Promise.all(CATEGORIES.map(cat => loadCategory(cat)));
+    let total = 0, anySample = false;
+    CATEGORIES.forEach((cat, i) => {
+      allData[cat.id] = results[i].items;
+      total += results[i].items.length;
+      if (results[i].isSample) anySample = true;
+    });
+
+    document.getElementById('total-count').textContent = `合計 ${total} 件`;
+    const now = new Date();
+    document.getElementById('last-update').textContent =
+      `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')} 更新`;
+
+    if (anySample) {
+      document.getElementById('sample-banner').style.display = 'flex';
+    }
+  }
+
+  // ============================================================
+  //  検索 (Fuse.js)
+  // ============================================================
+  function buildSearchIndex() {
+    searchDocs = [];
+    CATEGORIES.forEach(cat => {
+      (allData[cat.id] || []).forEach((item, idx) => {
+        searchDocs.push({
+          _catId:   cat.id,
+          _catName: cat.name,
+          _catIcon: cat.icon,
+          _idx:     idx,
+          searchText: Object.values(item).filter(Boolean).join(' '),
+        });
+      });
+    });
+    fuseIndex = new Fuse(searchDocs, {
+      keys: ['searchText'],
+      threshold: 0.4,
+      minMatchCharLength: 1,
+      includeScore: true,
+      ignoreLocation: true,
+    });
+  }
+
+  let searchTimer = null;
+
+  function onSearchInput(q) {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => doSearch(q.trim()), 150);
+  }
+
+  function doSearch(q) {
+    const sv  = document.getElementById('search-view');
+    const cv  = document.getElementById('categories-view');
+    const tabs = document.getElementById('cat-tabs');
+    const clrBtn = document.getElementById('search-clear');
+    const banner = document.getElementById('sample-banner');
+
+    if (!q) {
+      sv.classList.remove('active');
+      cv.style.display = '';
+      tabs.style.display = '';
+      banner.style.display = banner._wasShown ? 'flex' : 'none';
+      clrBtn.classList.add('hidden');
+      isSearchActive = false;
+      return;
+    }
+
+    clrBtn.classList.remove('hidden');
+    isSearchActive = true;
+    banner._wasShown = banner.style.display !== 'none';
+    cv.style.display = 'none';
+    tabs.style.display = 'none';
+    banner.style.display = 'none';
+    sv.classList.add('active');
+
+    const hits = fuseIndex.search(q);
+    document.getElementById('search-hd').textContent =
+      `「${q}」の検索結果: ${hits.length} 件`;
+
+    if (!hits.length) {
+      document.getElementById('search-results').innerHTML = `
+        <div class="no-results">
+          <div class="no-results-icon">🔍</div>
+          <div>検索結果が見つかりませんでした</div>
+          <div style="font-size:12px;margin-top:6px;color:var(--text-muted)">別のキーワードを試してみてください</div>
+        </div>`;
+      return;
+    }
+
+    // Group by category
+    const grouped = {};
+    hits.forEach(r => {
+      const id = r.item._catId;
+      if (!grouped[id]) grouped[id] = [];
+      grouped[id].push(r.item);
+    });
+
+    let html = '';
+    Object.entries(grouped).forEach(([catId, docs]) => {
+      const cat = CATEGORIES.find(c => c.id === catId);
+      if (!cat) return;
+      html += `<div class="search-result-group">
+        <div class="search-group-hd">
+          <span>${cat.icon}</span>
+          <span>${esc(cat.name)}</span>
+          <span style="margin-left:auto;font-family:var(--font-disp);color:var(--accent)">${docs.length}件</span>
+        </div>
+        <div class="cards-grid">`;
+      docs.forEach(doc => {
+        html += renderCard(cat, allData[doc._catId][doc._idx], doc._idx);
+      });
+      html += '</div></div>';
+    });
+    document.getElementById('search-results').innerHTML = html;
+  }
+
+  function clearSearch() {
+    document.getElementById('search-input').value = '';
+    doSearch('');
+  }
+
+  // ============================================================
+  //  ユーティリティ
+  // ============================================================
+  function esc(s) {
+    return String(s||'')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function isUrl(s) {
+    return s && (s.startsWith('http://') || s.startsWith('https://'));
+  }
+
+  function badge(val) {
+    if (!val) return '';
+    const c = STATUS_COLORS[val] || { bg: '#f1f5f9', text: '#64748b' };
+    return `<span class="badge" style="background:${c.bg};color:${c.text}">${esc(val)}</span>`;
+  }
+
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3500);
+  }
+
+  // ============================================================
+  //  カードレンダリング
+  // ============================================================
+  function renderCard(cat, item, idx) {
+    const titleVal    = item[cat.titleColumn] || '（未入力）';
+    const subtitleVal = item[cat.subtitleColumn] || '';
+    const statusVal   = cat.statusColumn ? item[cat.statusColumn] : '';
+    const linkUrl     = cat.titleLinkColumn ? item[cat.titleLinkColumn] : '';
+
+    const titleHtml = (linkUrl && isUrl(linkUrl))
+      ? `<a href="${esc(linkUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(titleVal)} ↗</a>`
+      : esc(titleVal);
+
+    let fieldsHtml = '';
+    if (cat.cardFields?.length) {
+      const fItems = cat.cardFields.filter(f => item[f.column]);
+      if (fItems.length) {
+        fieldsHtml = `<div class="card-fields">${
+          fItems.map(f => `<div class="cf-item">
+            <span class="cf-label">${esc(f.label)}</span>
+            <span class="cf-val">${esc(item[f.column])}</span>
+          </div>`).join('')
+        }</div>`;
+      }
+    }
+
+    const links = (cat.linkDefs||[]).filter(l => isUrl(item[l.column]));
+    const linksHtml = links.length
+      ? `<div class="link-chips">${links.map(l =>
+          `<a class="link-chip" href="${esc(item[l.column])}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${l.icon} ${esc(l.label)}</a>`
+        ).join('')}</div>` : '';
+
+    return `<div class="card" onclick="openModal('${cat.id}',${idx})">
+      <div class="card-head">
+        <div class="card-title">${titleHtml}</div>
+        ${badge(statusVal)}
+      </div>
+      ${subtitleVal ? `<div class="card-sub">${esc(subtitleVal)}</div>` : ''}
+      ${fieldsHtml}
+      ${linksHtml}
+    </div>`;
+  }
+
+  // ============================================================
+  //  カテゴリセクションレンダリング
+  // ============================================================
+  function renderCategorySection(cat, isFirst) {
+    const items = allData[cat.id] || [];
+    const cardsHtml = items.length
+      ? `<div class="cards-grid">${items.map((item,idx) => renderCard(cat,item,idx)).join('')}</div>`
+      : `<div class="empty-state">データがありません</div>`;
+
+    return `<div class="cat-section${isFirst?' open':''}" id="cat-${cat.id}">
+      <div class="cat-header" onclick="toggleCat('${cat.id}')">
+        <span class="cat-icon">${cat.icon}</span>
+        <span class="cat-name">${esc(cat.name)}</span>
+        <span class="cat-badge">${items.length}</span>
+        <span class="cat-chevron">▼</span>
+      </div>
+      <div class="cat-body">${cardsHtml}</div>
+    </div>`;
+  }
+
+  // ============================================================
+  //  全体レンダリング
+  // ============================================================
+  function renderAll() {
+    // Tabs
+    document.getElementById('cat-tabs').innerHTML =
+      CATEGORIES.map((cat, i) => {
+        const cnt = (allData[cat.id]||[]).length;
+        return `<button class="cat-tab${i===0?' active':''}" onclick="scrollToCat('${cat.id}',this)">
+          ${cat.icon} ${esc(cat.name)}
+          <span class="tab-count">${cnt}</span>
+        </button>`;
+      }).join('');
+
+    // Categories
+    document.getElementById('categories-view').innerHTML =
+      CATEGORIES.map((cat, i) => renderCategorySection(cat, i===0)).join('');
+  }
+
+  // ============================================================
+  //  モーダル
+  // ============================================================
+  function openModal(catId, idx) {
+    const cat  = CATEGORIES.find(c => c.id === catId);
+    const item = allData[catId]?.[idx];
+    if (!cat || !item) return;
+    currentModal = { catId, idx };
+
+    const titleVal    = item[cat.titleColumn] || '（未入力）';
+    const subtitleVal = item[cat.subtitleColumn] || '';
+    const statusVal   = cat.statusColumn ? item[cat.statusColumn] : '';
+    const skipCols    = new Set([cat.titleColumn, cat.subtitleColumn, cat.statusColumn]);
+    const linkCols    = new Set((cat.linkDefs||[]).map(l => l.column));
+
+    let fieldsHtml = '<div class="modal-fields">';
+    Object.entries(item).forEach(([k, v]) => {
+      if (!v || skipCols.has(k) || linkCols.has(k)) return;
+      fieldsHtml += `<div class="mf-item">
+        <div class="mf-label">${esc(k)}</div>
+        <div class="mf-val">${esc(v)}</div>
+      </div>`;
+    });
+    fieldsHtml += '</div>';
+
+    const links = (cat.linkDefs||[]).filter(l => isUrl(item[l.column]));
+    const linksHtml = links.length
+      ? `<div class="modal-links">${links.map(l =>
+          `<a class="modal-link-btn" href="${esc(item[l.column])}" target="_blank" rel="noopener">${l.icon} ${esc(l.label)}</a>`
+        ).join('')}</div>` : '';
+
+    document.getElementById('modal-body').innerHTML = `
+      <div class="modal-cat-label">${cat.icon} ${esc(cat.name)}</div>
+      <div class="modal-title">${esc(titleVal)}</div>
+      ${subtitleVal ? `<div class="modal-sub">${esc(subtitleVal)}</div>` : ''}
+      ${statusVal ? `<div style="margin-bottom:10px">${badge(statusVal)}</div>` : ''}
+      <div class="modal-divider"></div>
+      ${fieldsHtml}
+      ${linksHtml}`;
+
+    document.getElementById('modal-backdrop').classList.add('active');
+    requestAnimationFrame(() => {
+      document.getElementById('modal-panel').classList.add('active');
+    });
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal-panel').classList.remove('active');
+    document.getElementById('modal-backdrop').classList.remove('active');
+    document.body.style.overflow = '';
+    currentModal = null;
+  }
+
+  // ============================================================
+  //  UI ヘルパー
+  // ============================================================
+  function toggleCat(id) {
+    document.getElementById(`cat-${id}`)?.classList.toggle('open');
+  }
+
+  function scrollToCat(id, btn) {
+    document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const sec = document.getElementById(`cat-${id}`);
+    if (sec) {
+      sec.classList.add('open');
+      setTimeout(() => sec.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30);
+    }
+  }
+
+  // ============================================================
+  //  イベント
+  // ============================================================
+  document.getElementById('search-input').addEventListener('input', e => onSearchInput(e.target.value));
+  document.getElementById('search-clear').addEventListener('click', clearSearch);
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (currentModal)     { closeModal(); return; }
+      if (isSearchActive)   { clearSearch(); return; }
+    }
+  });
+
+  // ============================================================
+  //  初期化
+  // ============================================================
+  (async () => {
+    await loadAll();
+    renderAll();
+    buildSearchIndex();
+    document.getElementById('loading').classList.add('hidden');
+  })();
+  </script>
+</body>
+</html>

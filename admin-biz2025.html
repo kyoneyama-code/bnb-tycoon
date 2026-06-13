@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理者ページ — 案件ダッシュボード</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f8fa; --surface: #fff; --border: #e0e5ed;
+      --text: #1a1f2e; --text-muted: #8691a8;
+      --accent: #1a56db; --accent-soft: #eff4ff;
+      --green: #0d9467; --green-soft: #d1fae5;
+      --amber: #b45309; --amber-soft: #fef3c7;
+      --font: 'Noto Sans JP', sans-serif;
+      --font-disp: 'Outfit', sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.7;
+      min-height: 100dvh;
+      padding-bottom: 60px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logo-text {
+      font-family: var(--font-disp);
+      font-weight: 800;
+      font-size: 17px;
+    }
+
+    .logo-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: block;
+      margin-top: 1px;
+    }
+
+    .header-link {
+      font-size: 13px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+
+    h2 {
+      font-family: var(--font-disp);
+      font-weight: 800;
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .page-desc {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+
+    /* Step cards */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .step {
+      display: flex;
+      gap: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font-disp);
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .step-body {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .step-body code {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: var(--text);
+      word-break: break-all;
+    }
+
+    /* Section heading */
+    .section-title {
+      font-family: var(--font-disp);
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Sheet links grid */
+    .sheet-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 36px;
+    }
+
+    .sheet-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+
+    .sheet-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sheet-icon { font-size: 22px; flex-shrink: 0; }
+
+    .sheet-name {
+      font-weight: 700;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sheet-status {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .status-configured { background: var(--green-soft); color: var(--green); }
+    .status-sample     { background: var(--amber-soft); color: var(--amber); }
+
+    .sheet-btn {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      padding: 7px 14px;
+      border-radius: 999px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.12s;
+    }
+
+    .sheet-btn:hover { opacity: 0.85; }
+    .sheet-btn:disabled { background: var(--text-muted); cursor: default; }
+    .sheet-btn.disabled { background: var(--border); color: var(--text-muted); pointer-events: none; }
+
+    /* URL code display */
+    .url-code {
+      font-size: 11px;
+      color: var(--text-muted);
+      word-break: break-all;
+      margin-top: 3px;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Note box */
+    .note {
+      background: var(--amber-soft);
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--amber);
+      margin-bottom: 24px;
+    }
+
+    .note strong { font-weight: 700; display: block; margin-bottom: 4px; }
+
+    /* Info box */
+    .info-box {
+      background: var(--accent-soft);
+      border: 1px solid #c3d9ff;
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #1e40af;
+      margin-bottom: 24px;
+    }
+
+    /* Column definition table */
+    .col-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .col-table th {
+      text-align: left;
+      padding: 7px 10px;
+      background: var(--surface-2, #f0f2f6);
+      border-bottom: 2px solid var(--border);
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 11px;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .col-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .col-table tr:last-child td { border-bottom: none; }
+
+    .col-name {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      background: var(--bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .col-req { color: var(--accent); font-weight: 700; }
+    .col-opt { color: var(--text-muted); }
+
+    /* Tab content toggle */
+    details { margin-bottom: 10px; }
+
+    details summary {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 12px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+
+    details[open] summary { border-radius: 8px 8px 0 0; border-bottom: none; }
+
+    details summary::after { content: '▼'; margin-left: auto; font-size: 11px; color: var(--text-muted); }
+    details[open] summary::after { content: '▲'; }
+
+    details .detail-body {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      padding: 14px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo-text">管理者ページ</div>
+    <span class="logo-sub">AP Company — 案件ダッシュボード</span>
+  </div>
+  <a href="dashboard-biz2025.html" class="header-link">← ダッシュボードへ戻る</a>
+</header>
+
+<main>
+
+  <h2>Google Sheets 設定ガイド</h2>
+  <p class="page-desc">このページは管理者向けです。Google Sheetsと連携することで、スタッフがスプレッドシートを編集するだけでダッシュボードに反映されます。</p>
+
+  <!-- Step guide -->
+  <div class="section-title">📖 設定手順</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Google Sheetsを新規作成する</div>
+        <div class="step-body">
+          Google Driveで新しいスプレッドシートを作成します。<br>
+          シートのタブを7つに分けて、各カテゴリのデータを入力してください。<br>
+          <strong>1行目が必ず列名（ヘッダー）になるようにしてください。</strong>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">シートをウェブに公開する</div>
+        <div class="step-body">
+          Googleスプレッドシートで：<br>
+          <code>ファイル</code> → <code>共有</code> → <code>ウェブに公開</code> → 対象シートを選択 → <code>カンマ区切りの値（.csv）</code> → <code>公開</code><br><br>
+          発行されたURLが CSV URL です。カテゴリごとに繰り返してください。
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">dashboard-biz2025.html にURLを貼り付ける</div>
+        <div class="step-body">
+          <code>dashboard-biz2025.html</code> をテキストエディタで開き、<br>
+          各カテゴリの <code>sheetUrl: "",</code> の <code>""</code> の中にURLを貼り付けてください。<br>
+          例：<code>sheetUrl: "https://docs.google.com/spreadsheets/d/xxxxx/export?format=csv&amp;gid=0",</code>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">ファイルをGitHubにプッシュ → GitHub Pagesで確認</div>
+        <div class="step-body">
+          変更をGitにコミットして <code>git push</code> してください。<br>
+          GitHub Pagesのデプロイが完了したらダッシュボードURLで確認できます。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note -->
+  <div class="note">
+    <strong>⚠️ 注意：共有設定について</strong>
+    スプレッドシート自体は「<strong>リンクを知っている全員が閲覧可能</strong>」に設定してください。<br>
+    編集権限は付与する必要はありません。スタッフはGoogleアカウントでシートを開いて編集してください。
+  </div>
+
+  <!-- Sheet links -->
+  <div class="section-title">📋 シートを開いて編集</div>
+  <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
+    URLが設定済みの場合はボタンからシートを直接開けます。未設定の場合はボタンが無効です。
+  </p>
+
+  <div class="sheet-grid" id="sheet-grid">
+    <!-- Dynamically filled by JS -->
+  </div>
+
+  <!-- Column definitions -->
+  <div class="section-title">🗂 各カテゴリの列名一覧</div>
+  <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
+    Googleスプレッドシートの1行目（ヘッダー行）にこの列名を<strong>正確に</strong>入力してください。<br>
+    <span class="col-req">★必須</span>はタイトルや表示に使う列です。その他は任意です。
+  </p>
+
+  <details>
+    <summary>🏢 物件候補地</summary>
+    <div class="detail-body">
+      <table class="col-table">
+        <thead><tr><th>列名</th><th>説明</th><th>必須</th></tr></thead>
+        <tbody>
+          <tr><td><code class="col-name">物件名</code></td><td>物件の名称（タイトルとして表示）</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">住所</code></td><td>所在地</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">価格帯</code></td><td>例: 3.2億円</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">利回り</code></td><td>例: 5.2%</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">面積</code></td><td>例: 250㎡</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">ステータス</code></td><td>検討中 / 交渉中 / 契約済 / 見送り など</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">GoogleMaps URL</code></td><td>GoogleマップのURL（ボタンで表示）</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">資料URL</code></td><td>物件資料のURL</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">備考</code></td><td>自由記述</td><td class="col-opt">任意</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>🤝 M&A案件</summary>
+    <div class="detail-body">
+      <table class="col-table">
+        <thead><tr><th>列名</th><th>説明</th><th>必須</th></tr></thead>
+        <tbody>
+          <tr><td><code class="col-name">会社名</code></td><td>対象会社名（タイトルとして表示）</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">業種</code></td><td>例: 旅館・ホテル業</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">売上規模</code></td><td>例: 年商3億円</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">価格感</code></td><td>買収希望価格感</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">会社URL</code></td><td>会社HPのURL（会社名がリンクになります）</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">担当者</code></td><td>FA・担当者名</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">ステータス</code></td><td>検討中 / 交渉中 / 契約済 など</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">資料URL</code></td><td>IM・資料のURL</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">備考</code></td><td>自由記述</td><td class="col-opt">任意</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>🔥 トレーラー・サウナ価格比較</summary>
+    <div class="detail-body">
+      <table class="col-table">
+        <thead><tr><th>列名</th><th>説明</th><th>必須</th></tr></thead>
+        <tbody>
+          <tr><td><code class="col-name">メーカー</code></td><td>メーカー名（タイトルとして表示）</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">モデル</code></td><td>モデル・製品名</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">定価</code></td><td>希望小売価格</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">実勢価格</code></td><td>実際の取引価格目安</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">定員</code></td><td>例: 6〜8名</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">公式URL</code></td><td>メーカーHPのURL（メーカー名がリンクになります）</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">特徴</code></td><td>製品の特徴</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">備考</code></td><td>納期・注意事項など</td><td class="col-opt">任意</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>🏠 現所有物件の民泊情報</summary>
+    <div class="detail-body">
+      <table class="col-table">
+        <thead><tr><th>列名</th><th>説明</th><th>必須</th></tr></thead>
+        <tbody>
+          <tr><td><code class="col-name">物件名</code></td><td>物件名（タイトルとして表示）</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">エリア</code></td><td>所在エリア</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">Airbnb URL</code></td><td>Airbnb掲載ページのURL</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">Instagram URL</code></td><td>Instagram アカウントのURL</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">GoogleMaps URL</code></td><td>Google マップのURL</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">月間収益目安</code></td><td>例: 45万円</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">稼働率</code></td><td>例: 76%</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">稼働状況</code></td><td>稼働中 / 停止中 など</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">備考</code></td><td>自由記述</td><td class="col-opt">任意</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>📊 競合・マーケット調査</summary>
+    <div class="detail-body">
+      <table class="col-table">
+        <thead><tr><th>列名</th><th>説明</th><th>必須</th></tr></thead>
+        <tbody>
+          <tr><td><code class="col-name">エリア</code></td><td>調査エリア（タイトルとして表示）</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">調査日</code></td><td>例: 2025-06-01</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">競合物件名</code></td><td>主な競合物件名</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">平均単価</code></td><td>例: ¥15,000/泊</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">稼働率目安</code></td><td>例: 72%</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">参考URL</code></td><td>参考サイトのURL</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">備考</code></td><td>自由記述</td><td class="col-opt">任意</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>🔧 業者・外注管理</summary>
+    <div class="detail-body">
+      <table class="col-table">
+        <thead><tr><th>列名</th><th>説明</th><th>必須</th></tr></thead>
+        <tbody>
+          <tr><td><code class="col-name">会社名</code></td><td>業者名（タイトルとして表示）</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">業種</code></td><td>例: 清掃 / 電気修繕 など</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">担当者</code></td><td>窓口担当者名</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">連絡先</code></td><td>電話番号・メールアドレス</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">単価目安</code></td><td>例: ¥8,000/回</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">評価</code></td><td>★★★★★ 〜 ★ で入力</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">備考</code></td><td>自由記述</td><td class="col-opt">任意</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>📋 許認可・法務進捗</summary>
+    <div class="detail-body">
+      <table class="col-table">
+        <thead><tr><th>列名</th><th>説明</th><th>必須</th></tr></thead>
+        <tbody>
+          <tr><td><code class="col-name">物件名</code></td><td>対象物件名（タイトルとして表示）</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">申請種別</code></td><td>例: 住宅宿泊事業届出 / 消防設備点検</td><td class="col-req">★</td></tr>
+          <tr><td><code class="col-name">ステータス</code></td><td>申請中 / 取得済 / 要確認 など</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">期限</code></td><td>例: 2025-09-30</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">担当窓口</code></td><td>申請先機関名</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">書類URL</code></td><td>許可証・書類のURL</td><td class="col-opt">任意</td></tr>
+          <tr><td><code class="col-name">備考</code></td><td>自由記述</td><td class="col-opt">任意</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <br>
+
+  <!-- New category instructions -->
+  <div class="info-box">
+    <strong>💡 カテゴリを追加するには</strong>
+    <code>dashboard-biz2025.html</code> の <code>CATEGORIES</code> 配列に新しいオブジェクトを追加するだけです。
+    既存のカテゴリをコピーして、<code>id / name / icon / titleColumn / sheetUrl / cardFields / linkDefs / sampleData</code> を書き換えてください。
+  </div>
+
+</main>
+
+<script>
+  // Dynamically read CATEGORIES from dashboard to show current status
+  // Since this is a separate file, we just show static links
+  const SHEET_CATEGORIES = [
+    { id: "properties", name: "物件候補地",         icon: "🏢" },
+    { id: "ma",         name: "M&A案件",             icon: "🤝" },
+    { id: "trailer",    name: "トレーラー・サウナ",   icon: "🔥" },
+    { id: "minpaku",    name: "現所有物件の民泊情報", icon: "🏠" },
+    { id: "competitor", name: "競合・マーケット調査", icon: "📊" },
+    { id: "vendors",    name: "業者・外注管理",       icon: "🔧" },
+    { id: "legal",      name: "許認可・法務進捗",     icon: "📋" },
+  ];
+
+  const grid = document.getElementById('sheet-grid');
+  SHEET_CATEGORIES.forEach(cat => {
+    // In production, sheetUrls come from the dashboard CONFIG
+    // Here we just show open buttons with placeholder
+    grid.innerHTML += `
+      <div class="sheet-item">
+        <div class="sheet-left">
+          <span class="sheet-icon">${cat.icon}</span>
+          <div>
+            <div class="sheet-name">${cat.name}</div>
+            <div class="url-code">未設定 — dashboard-biz2025.html の sheetUrl に入力してください</div>
+          </div>
+        </div>
+        <span class="badge status-sample" style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap">未設定</span>
+      </div>`;
+  });
+</script>
+
+</body>
+</html>
