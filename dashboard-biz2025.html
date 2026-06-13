@@ -737,6 +737,11 @@
   <div class="toast" id="toast"></div>
 
   <!-- ============================================================
+       DATA (source of truth — Claudeがチャットで追記するファイル)
+  ============================================================ -->
+  <script src="data-biz2025.js"></script>
+
+  <!-- ============================================================
        SCRIPT
   ============================================================ -->
   <script>
@@ -1056,37 +1061,23 @@
   // ============================================================
   //  データ読み込み
   // ============================================================
-  async function loadCategory(cat) {
-    if (!cat.sheetUrl) return { items: cat.sampleData || [], isSample: true };
-    try {
-      const res = await fetch(cat.sheetUrl);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const text = await res.text();
-      const items = parseCSV(text);
-      return { items, isSample: false };
-    } catch (e) {
-      console.warn(`[${cat.name}] Sheets fetch failed, using sample data:`, e.message);
-      return { items: cat.sampleData || [], isSample: true };
-    }
+  function loadCategory(cat) {
+    const d = (window.DASHBOARD_DATA && window.DASHBOARD_DATA[cat.id]);
+    if (Array.isArray(d)) return d;
+    return cat.sampleData || [];   // data-biz2025.js が無い場合のフォールバック
   }
 
-  async function loadAll() {
-    const results = await Promise.all(CATEGORIES.map(cat => loadCategory(cat)));
-    let total = 0, anySample = false;
-    CATEGORIES.forEach((cat, i) => {
-      allData[cat.id] = results[i].items;
-      total += results[i].items.length;
-      if (results[i].isSample) anySample = true;
+  function loadAll() {
+    let total = 0;
+    CATEGORIES.forEach(cat => {
+      allData[cat.id] = loadCategory(cat);
+      total += allData[cat.id].length;
     });
 
     document.getElementById('total-count').textContent = `合計 ${total} 件`;
-    const now = new Date();
+    const meta = window.DASHBOARD_META;
     document.getElementById('last-update').textContent =
-      `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')} 更新`;
-
-    if (anySample) {
-      document.getElementById('sample-banner').style.display = 'flex';
-    }
+      (meta && meta.updated) ? `${meta.updated} 更新` : '';
   }
 
   // ============================================================
@@ -1387,8 +1378,8 @@
   // ============================================================
   //  初期化
   // ============================================================
-  (async () => {
-    await loadAll();
+  (function init() {
+    loadAll();
     renderAll();
     buildSearchIndex();
     document.getElementById('loading').classList.add('hidden');

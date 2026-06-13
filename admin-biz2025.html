@@ -333,62 +333,51 @@
 
 <main>
 
-  <h2>Google Sheets 設定ガイド</h2>
-  <p class="page-desc">このページは管理者向けです。Google Sheetsと連携することで、スタッフがスプレッドシートを編集するだけでダッシュボードに反映されます。</p>
+  <h2>管理・更新ガイド</h2>
+  <p class="page-desc">このダッシュボードのデータは <code>data-biz2025.js</code> というファイルにまとまっています。更新する方法は3通りあります。</p>
 
   <!-- Step guide -->
-  <div class="section-title">📖 設定手順</div>
+  <div class="section-title">✏️ データを更新する3つの方法</div>
   <div class="steps">
     <div class="step">
       <div class="step-num">1</div>
       <div>
-        <div class="step-title">Google Sheetsを新規作成する</div>
+        <div class="step-title">チャットでClaudeに頼む（いちばん簡単・推奨）</div>
         <div class="step-body">
-          Google Driveで新しいスプレッドシートを作成します。<br>
-          シートのタブを7つに分けて、各カテゴリのデータを入力してください。<br>
-          <strong>1行目が必ず列名（ヘッダー）になるようにしてください。</strong>
+          チャットで「物件候補地に○○を追加して」「△△のステータスを契約済にして」などと伝えるだけ。<br>
+          Claudeがデータファイルに記入してpushし、約1分でダッシュボードに反映されます。<br>
+          Googleマップ・Airbnb・InstagramのリンクもそのままURLを貼って渡せばOKです。
         </div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">2</div>
       <div>
-        <div class="step-title">シートをウェブに公開する</div>
+        <div class="step-title">Googleシートで編集して同期する</div>
         <div class="step-body">
-          Googleスプレッドシートで：<br>
-          <code>ファイル</code> → <code>共有</code> → <code>ウェブに公開</code> → 対象シートを選択 → <code>カンマ区切りの値（.csv）</code> → <code>公開</code><br><br>
-          発行されたURLが CSV URL です。カテゴリごとに繰り返してください。
+          下のボタンから各カテゴリのスプレッドシートを開いて、いつも通り編集します。<br>
+          まとめて編集したら、チャットで <strong>「シートをダッシュボードに反映して」</strong> と伝えてください。<br>
+          Claudeがシートを読み込んでデータファイルに同期します。
         </div>
       </div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
       <div>
-        <div class="step-title">dashboard-biz2025.html にURLを貼り付ける</div>
+        <div class="step-title">data-biz2025.js を直接編集する（上級者向け）</div>
         <div class="step-body">
-          <code>dashboard-biz2025.html</code> をテキストエディタで開き、<br>
-          各カテゴリの <code>sheetUrl: "",</code> の <code>""</code> の中にURLを貼り付けてください。<br>
-          例：<code>sheetUrl: "https://docs.google.com/spreadsheets/d/xxxxx/export?format=csv&amp;gid=0",</code>
-        </div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div>
-        <div class="step-title">ファイルをGitHubにプッシュ → GitHub Pagesで確認</div>
-        <div class="step-body">
-          変更をGitにコミットして <code>git push</code> してください。<br>
-          GitHub Pagesのデプロイが完了したらダッシュボードURLで確認できます。
+          GitHub上で <code>data-biz2025.js</code> を開き、各カテゴリの配列にデータを追記します。<br>
+          列名（キー）は下の「各カテゴリの列名一覧」に合わせてください。
         </div>
       </div>
     </div>
   </div>
 
   <!-- Note -->
-  <div class="note">
-    <strong>⚠️ 注意：共有設定について</strong>
-    スプレッドシート自体は「<strong>リンクを知っている全員が閲覧可能</strong>」に設定してください。<br>
-    編集権限は付与する必要はありません。スタッフはGoogleアカウントでシートを開いて編集してください。
+  <div class="info-box">
+    <strong>✅ 「ウェブに公開」は不要になりました</strong>
+    データはリポジトリ内のファイルで管理する方式に変更したため、Googleスプレッドシートの「ウェブに公開」やCSV URLの設定は不要です。
+    シートはあくまで「みんなで下書き・編集する場所」として使い、反映はチャットでClaudeに頼んでください。
   </div>
 
   <!-- Sheet links -->
