@@ -1003,6 +1003,24 @@
           "備考": "スプリンクラー設置確認が必要。"
         }
       ]
+    },
+    {
+      id: "docs",
+      name: "資料・ドキュメント",
+      icon: "📁",
+      sheetUrl: "",
+      titleColumn: "資料名",
+      subtitleColumn: "種別",
+      statusColumn: "",
+      titleLinkColumn: "ファイルURL",
+      cardFields: [
+        { label: "更新日", column: "更新日" },
+        { label: "関連",   column: "関連" },
+      ],
+      linkDefs: [
+        { column: "ファイルURL", label: "PDFを開く", icon: "📄" },
+      ],
+      sampleData: []
     }
   ];
 
@@ -1202,7 +1220,11 @@
   }
 
   function isUrl(s) {
-    return s && (s.startsWith('http://') || s.startsWith('https://'));
+    if (!s) return false;
+    if (s.startsWith('http://') || s.startsWith('https://')) return true;
+    // リポジトリ内ファイル（相対パス）も許可: docs/foo.pdf, ./foo.pdf, *.pdf 等
+    return /^(\.?\/)?[\w./%\-－ぁ-んァ-ヶ一-龯]+\.(pdf|png|jpe?g|gif|webp|docx?|xlsx?|pptx?)$/i.test(s)
+        || s.startsWith('docs/');
   }
 
   function badge(val) {
