@@ -1091,7 +1091,7 @@
   function loadCategory(cat) {
     const d = (window.DASHBOARD_DATA && window.DASHBOARD_DATA[cat.id]);
     if (Array.isArray(d)) return d;
-    return cat.sampleData || [];   // data-biz2025.js が無い場合のフォールバック
+    return [];   // データは data-biz2025.js が唯一の供給元
   }
 
   function loadAll() {
