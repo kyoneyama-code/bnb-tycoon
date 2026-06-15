@@ -15,9 +15,98 @@
       --accent:      #2f5d50;
       --accent-soft: #e7efe9;
     }
+    /* ── 簡易パスワードゲート ── */
+    #pw-gate {
+      position: fixed; inset: 0; z-index: 500;
+      background: #f3f1ec;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    #pw-gate.unlocked { display: none; }
+    .pw-box {
+      width: 100%; max-width: 340px; text-align: center;
+      background: #fff; border: 1px solid #e4e0d6; border-radius: 18px;
+      padding: 32px 26px; box-shadow: 0 6px 24px rgba(40,40,30,0.08);
+    }
+    .pw-tag {
+      display: inline-block; font-family: 'Outfit', sans-serif;
+      font-weight: 800; font-size: 11px; letter-spacing: 0.14em;
+      color: #fff; background: #2f5d50; padding: 3px 11px;
+      border-radius: 7px; margin-bottom: 14px;
+    }
+    .pw-title {
+      font-family: Georgia, "Hiragino Mincho ProN", serif;
+      font-weight: 700; font-size: 21px; color: #1c2622; margin-bottom: 6px;
+    }
+    .pw-desc { font-size: 12.5px; color: #7c8580; margin-bottom: 20px; line-height: 1.6; }
+    #pw-form { display: flex; flex-direction: column; gap: 10px; }
+    #pw-input {
+      width: 100%; padding: 12px 14px; font-size: 16px;
+      border: 1.5px solid #e4e0d6; border-radius: 12px;
+      font-family: 'Noto Sans JP', sans-serif; outline: none;
+      -webkit-appearance: none;
+    }
+    #pw-input:focus { border-color: #2f5d50; box-shadow: 0 0 0 3px rgba(47,93,80,0.12); }
+    #pw-form button {
+      padding: 12px; font-size: 15px; font-weight: 700; color: #fff;
+      background: #2f5d50; border: none; border-radius: 12px; cursor: pointer;
+      font-family: 'Noto Sans JP', sans-serif; transition: opacity 0.12s;
+    }
+    #pw-form button:hover { opacity: 0.88; }
+    .pw-error { font-size: 12.5px; color: #b13b2b; margin-top: 12px; min-height: 16px; }
   </style>
 </head>
 <body>
+
+  <!-- ── 簡易パスワードゲート（クライアント側・難読化レベル） ── -->
+  <div id="pw-gate">
+    <div class="pw-box">
+      <span class="pw-tag">MTR</span>
+      <div class="pw-title">不動産ダッシュボード</div>
+      <p class="pw-desc">この画面はパスワードで保護されています。<br>閲覧にはパスワードを入力してください。</p>
+      <form id="pw-form" autocomplete="off">
+        <input type="password" id="pw-input" placeholder="パスワード" autocomplete="current-password">
+        <button type="submit">開く</button>
+      </form>
+      <p class="pw-error" id="pw-error"></p>
+    </div>
+  </div>
+  <script>
+  (function () {
+    // "yone0009" の SHA-256 ハッシュ（平文はソースに残さない）
+    const PW_HASH = "7854406471c9e10ca1d1fbab1c718507f597c90033cf7f30e4568102c5a03034";
+    const KEY = "mtr_dash_auth_v1";
+    const gate = document.getElementById('pw-gate');
+
+    function unlock() { gate.classList.add('unlocked'); }
+
+    async function sha256(str) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // 同一セッション中は再入力不要
+    if (sessionStorage.getItem(KEY) === PW_HASH) { unlock(); }
+
+    document.getElementById('pw-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const errEl = document.getElementById('pw-error');
+      const val = document.getElementById('pw-input').value;
+      try {
+        const h = await sha256(val);
+        if (h === PW_HASH) {
+          sessionStorage.setItem(KEY, h);
+          unlock();
+        } else {
+          errEl.textContent = 'パスワードが違います。';
+          document.getElementById('pw-input').value = '';
+        }
+      } catch (_) {
+        errEl.textContent = 'この環境では照合できません（https でアクセスしてください）。';
+      }
+    });
+  })();
+  </script>
 
   <header>
     <div class="header-top">
