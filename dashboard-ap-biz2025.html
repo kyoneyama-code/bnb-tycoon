@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>AP 事業ダッシュボード — AP Holdings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard-core.css">
+  <script src="fuse.min.js"></script>
+  <!-- AP テーマ（飲食・運営サイド = テラコッタ） -->
+  <style>
+    :root {
+      --accent:      #b4622f;
+      --accent-soft: #f6e7da;
+    }
+    .logo-sub { color: #2f5d50; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-top">
+      <div class="logo-wrap">
+        <span class="site-tag">AP</span>
+        <span class="logo-text">事業ダッシュボード</span>
+        <span class="logo-sub">AP Holdings · 運営サイド</span>
+      </div>
+      <div class="header-right">
+        <a class="site-switch" href="dashboard-mtr-biz2025.html">MTR不動産へ →</a>
+        <span class="total-count" id="total-count">読み込み中...</span>
+        <span class="last-update" id="last-update"></span>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="search" id="search-input"
+               placeholder="会社名・業種・業者名などで検索..."
+               autocomplete="off" spellcheck="false">
+        <button id="search-clear" class="hidden" aria-label="検索をクリア">✕</button>
+      </div>
+    </div>
+    <div class="cat-tabs" id="cat-tabs"></div>
+  </header>
+
+  <main>
+    <div class="sample-banner" id="sample-banner" style="display:none"></div>
+    <div id="categories-view"></div>
+    <div id="search-view">
+      <div class="search-hd" id="search-hd"></div>
+      <div id="search-results"></div>
+    </div>
+  </main>
+
+  <div class="modal-backdrop" id="modal-backdrop" onclick="closeModal()"></div>
+  <div class="modal-panel" id="modal-panel">
+    <div class="modal-sticky-top">
+      <div class="modal-handle"></div>
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>データを読み込んでいます...</p>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <!-- 共通データ（source of truth） -->
+  <script src="data-biz2025.js"></script>
+
+  <!-- このサイトのカテゴリ定義（AP = 飲食・運営サイド） -->
+  <script>
+  window.SITE_CATEGORIES = [
+    {
+      id: "ma",
+      name: "M&A案件",
+      icon: "🤝",
+      titleColumn: "会社名",
+      subtitleColumn: "業種",
+      statusColumn: "ステータス",
+      titleLinkColumn: "会社URL",
+      cardFields: [
+        { label: "売上規模", column: "売上規模" },
+        { label: "価格感",   column: "価格感" },
+        { label: "担当者",   column: "担当者" },
+      ],
+      linkDefs: [
+        { column: "会社URL", label: "会社HP", icon: "🌐" },
+        { column: "資料URL", label: "資料",   icon: "📄" },
+      ],
+    },
+    {
+      id: "competitor",
+      name: "競合・マーケット調査",
+      icon: "📊",
+      titleColumn: "エリア",
+      subtitleColumn: "調査日",
+      statusColumn: "",
+      titleLinkColumn: "",
+      cardFields: [
+        { label: "競合物件名", column: "競合物件名" },
+        { label: "平均単価",   column: "平均単価" },
+        { label: "稼働率目安", column: "稼働率目安" },
+      ],
+      linkDefs: [
+        { column: "参考URL", label: "参考リンク", icon: "🔗" },
+      ],
+    },
+    {
+      id: "vendors",
+      name: "業者・外注管理",
+      icon: "🔧",
+      titleColumn: "会社名",
+      subtitleColumn: "業種",
+      statusColumn: "評価",
+      titleLinkColumn: "",
+      cardFields: [
+        { label: "担当者",   column: "担当者" },
+        { label: "単価目安", column: "単価目安" },
+        { label: "連絡先",   column: "連絡先" },
+      ],
+      linkDefs: [],
+    },
+    {
+      id: "docs",
+      name: "資料・ドキュメント",
+      icon: "📁",
+      titleColumn: "資料名",
+      subtitleColumn: "種別",
+      statusColumn: "",
+      titleLinkColumn: "ファイルURL",
+      cardFields: [
+        { label: "更新日", column: "更新日" },
+        { label: "関連",   column: "関連" },
+      ],
+      linkDefs: [
+        { column: "ファイルURL", label: "資料を開く", icon: "📄" },
+      ],
+    }
+  ];
+  </script>
+
+  <!-- 共通エンジン -->
+  <script src="dashboard-core.js"></script>
+</body>
+</html>

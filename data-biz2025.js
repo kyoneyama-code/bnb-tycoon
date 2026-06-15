@@ -4,7 +4,8 @@
    ここが唯一のデータの保管場所（source of truth）です。
    チャットでClaudeに「○○を追加して」と言えば、ここに記入してpushします。
    手で編集する場合も、各カテゴリの配列にオブジェクトを追加するだけです。
-   列名（キー）は dashboard-biz2025.html の CATEGORIES 定義と揃えてください。
+   列名（キー）は各サイトHTML（dashboard-mtr/ap-biz2025.html）の SITE_CATEGORIES 定義と揃えてください。
+   このデータは MTR・AP 両ダッシュボードが共通で読み込みます（docs は両サイトに表示）。
    ============================================================ */
 
 window.DASHBOARD_META = {

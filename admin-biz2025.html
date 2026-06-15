@@ -540,9 +540,10 @@
 
   <!-- New category instructions -->
   <div class="info-box">
-    <strong>💡 カテゴリを追加するには</strong>
-    <code>dashboard-biz2025.html</code> の <code>CATEGORIES</code> 配列に新しいオブジェクトを追加するだけです。
-    既存のカテゴリをコピーして、<code>id / name / icon / titleColumn / sheetUrl / cardFields / linkDefs / sampleData</code> を書き換えてください。
+    <strong>💡 サイト構成・カテゴリを追加するには</strong>
+    ダッシュボードは <code>dashboard-mtr-biz2025.html</code>（不動産・資産サイド）と <code>dashboard-ap-biz2025.html</code>（飲食・運営サイド）の2サイトに分かれています。
+    どちらも共通エンジン <code>dashboard-core.js</code>／共通スタイル <code>dashboard-core.css</code> を読み込み、各HTML内の <code>window.SITE_CATEGORIES</code> 配列で表示カテゴリを定義します。
+    カテゴリを追加する場合は、対象サイトの <code>SITE_CATEGORIES</code> に <code>id / name / icon / titleColumn / cardFields / linkDefs</code> を持つオブジェクトを追加してください（資料カテゴリ <code>docs</code> は両サイト共通）。
   </div>
 
 </main>
