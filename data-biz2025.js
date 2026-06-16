@@ -169,6 +169,16 @@ window.DASHBOARD_DATA = {
     }
   ],
 
+  /* ── 社長室 ── */
+  "shacho": [
+    {
+      "タイトル": "案件進捗表",
+      "種別": "Googleスプレッドシート",
+      "URL": "https://docs.google.com/spreadsheets/d/1bq_IdUF1xVqzY22jNpXp_vCT2ZTUbq3VQWm1vEfVqZw/edit?usp=sharing",
+      "備考": "社内メールアカウントでログイン後に閲覧・編集可能。"
+    }
+  ],
+
   /* ── 競合・マーケット調査 ── */
   "competitor": [],
 
