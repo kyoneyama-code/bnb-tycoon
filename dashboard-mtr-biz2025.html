@@ -164,6 +164,38 @@
   <script>
   window.SITE_CATEGORIES = [
     {
+      id: "gyomu",
+      name: "業務棚卸シート",
+      icon: "📋",
+      titleColumn: "業務名",
+      subtitleColumn: "業務カテゴリー",
+      statusColumn: "区分",
+      titleLinkColumn: "",
+      cardFields: [
+        { label: "頻度",                 column: "頻度" },
+        { label: "記入者",               column: "記入者" },
+        { label: "具体的な内容",         column: "具体的な中身・背景" },
+        { label: "備考・次のアクション", column: "備考・次のアクション" },
+      ],
+      linkDefs: [],
+    },
+    {
+      id: "ankenhyo",
+      name: "案件帳票",
+      icon: "📊",
+      titleColumn: "案件名",
+      subtitleColumn: "区分",
+      statusColumn: "現在のステータス",
+      titleLinkColumn: "",
+      cardFields: [
+        { label: "担当",               column: "担当" },
+        { label: "投資規模",           column: "投資規模" },
+        { label: "直近アクション・期限", column: "直近アクション・期限" },
+        { label: "リスク・懸念点",     column: "リスク・懸念点" },
+      ],
+      linkDefs: [],
+    },
+    {
       id: "properties",
       name: "物件候補地",
       icon: "🏢",
@@ -252,7 +284,69 @@
   ];
   </script>
 
-  <!-- 共通エンジン -->
-  <script src="dashboard-core.js"></script>
+  <!-- Google Sheets → DASHBOARD_DATA 非同期マージ + コア起動 -->
+  <script>
+  (function () {
+    /* シートを「ウェブに公開」(ファイル→共有→ウェブに公開→CSV) してください */
+    var SHEET_ID = '1aKZc9Iq51MASg6apI8WrDTYkbAUnfWKH2Xhpxr5pols';
+
+    function parseCSV(text) {
+      var rows = [], inQ = false, row = [], cur = '';
+      for (var i = 0; i <= text.length; i++) {
+        var ch = i < text.length ? text[i] : '\n';
+        if (ch === '"') {
+          if (inQ && text[i + 1] === '"') { cur += '"'; i++; }
+          else inQ = !inQ;
+        } else if (ch === ',' && !inQ) {
+          row.push(cur); cur = '';
+        } else if ((ch === '\n' || ch === '\r') && !inQ) {
+          if (ch === '\r' && text[i + 1] === '\n') i++;
+          row.push(cur); cur = '';
+          if (row.some(function(v) { return v; })) rows.push(row);
+          row = [];
+        } else { cur += ch; }
+      }
+      return rows;
+    }
+
+    function csvToObjects(text) {
+      var rows = parseCSV(text);
+      if (rows.length < 2) return [];
+      var headers = rows[0];
+      return rows.slice(1).map(function(row) {
+        var obj = {};
+        headers.forEach(function(h, i) { obj[h.trim()] = (row[i] || '').trim(); });
+        return obj;
+      }).filter(function(obj) {
+        return headers.some(function(h) { return obj[h.trim()]; });
+      });
+    }
+
+    function bootCore() {
+      var s = document.createElement('script');
+      s.src = 'dashboard-core.js';
+      document.body.appendChild(s);
+    }
+
+    /* 初期値（フェッチ失敗時は空リスト） */
+    window.DASHBOARD_DATA.gyomu    = [];
+    window.DASHBOARD_DATA.ankenhyo = [];
+
+    var base = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID
+             + '/gviz/tq?tqx=out:csv&sheet=';
+
+    Promise.all([
+      fetch(base + encodeURIComponent('MTR業務棚卸シート'))
+        .then(function(r) { return r.ok ? r.text() : Promise.reject(r.status); }),
+      fetch(base + encodeURIComponent('案件帳票'))
+        .then(function(r) { return r.ok ? r.text() : Promise.reject(r.status); }),
+    ]).then(function(res) {
+      window.DASHBOARD_DATA.gyomu    = csvToObjects(res[0]);
+      window.DASHBOARD_DATA.ankenhyo = csvToObjects(res[1]);
+    }).catch(function(err) {
+      console.warn('[MTR] Sheetsフェッチ失敗 – ウェブに公開されていない可能性:', err);
+    }).then(bootCore);
+  })();
+  </script>
 </body>
 </html>
