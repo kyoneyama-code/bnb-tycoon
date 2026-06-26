@@ -1,0 +1,107 @@
+name: Claude Code (headless)
+
+# 無人実行(headless モード)で Claude Code を回すワークフロー。
+#   - workflow_dispatch: 手動でタスク文を渡して実行
+#   - schedule: 毎日 JST 03:00(UTC 18:00)に定期実行(例)
+#
+# 必要な secret:
+#   ANTHROPIC_API_KEY  ... Anthropic API キー(Settings > Secrets で登録)
+#
+# 注意(記事の精神):
+#   --dangerously-skip-permissions は隔離された CI 環境(使い捨て)でのみ使う。
+#   結果はブランチへ push し、人間が PR でレビューしてからマージする。
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "Claude に実行させる指示文"
+        required: true
+        type: string
+  schedule:
+    # 毎日 18:00 UTC = JST 03:00。不要なら schedule ブロックごと削除。
+    - cron: "0 18 * * *"
+
+# 同時実行を 1 本に絞る(暴走・多重実行の防止)
+concurrency:
+  group: claude-headless
+  cancel-in-progress: false
+
+permissions:
+  contents: write       # ブランチへ push するため
+  pull-requests: write  # PR 作成するため
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Configure git
+        run: |
+          git config user.name  "claude-bot"
+          git config user.email "claude-bot@users.noreply.github.com"
+
+      - name: Create working branch
+        id: branch
+        run: |
+          BRANCH="claude/headless-${{ github.run_id }}"
+          git switch -c "$BRANCH"
+          echo "name=$BRANCH" >> "$GITHUB_OUTPUT"
+
+      - name: Run Claude (headless)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TASK: ${{ inputs.task || '依存関係とドキュメントの軽微な改善点を洗い出し、安全な範囲で修正してください。' }}
+        run: |
+          claude -p "$TASK" \
+            --dangerously-skip-permissions \
+            --output-format json \
+            > claude-output.json 2>&1 || true
+          echo "----- Claude output -----"
+          cat claude-output.json || true
+
+      - name: Commit & push if changed
+        id: commit
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "chore: automated changes by Claude Code (headless)"
+            git push -u origin "${{ steps.branch.outputs.name }}"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No changes produced."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open pull request
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "${{ steps.branch.outputs.name }}" \
+            --title "Automated changes by Claude Code (headless)" \
+            --body "headless モードによる自動変更です。マージ前に必ず人間がレビューしてください。" \
+            || echo "PR 作成をスキップ(既存 or 権限不足)"
+
+      - name: Upload run log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-output
+          path: claude-output.json
+          if-no-files-found: ignore

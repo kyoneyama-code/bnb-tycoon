@@ -1,0 +1,38 @@
+# === 秘匿情報の隔離(記事ポイント②) ===
+# これらは絶対にリポジトリへコミットしない。
+# bypassモードでの暴走・漏洩時の被害を最小化する。
+.env
+.env.*
+*.local
+secrets/
+*.pem
+*.key
+id_rsa
+id_ed25519
+*.p12
+*.pfx
+
+# クラウド認証情報
+.aws/
+.gcp/
+gcloud/
+*-service-account*.json
+credentials.json
+
+# Claude / ツール系
+.claude/settings.local.json
+.anthropic/
+
+# OS / エディタ
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# ログ・一時ファイル
+*.log
+log.json
+tmp/
+node_modules/
