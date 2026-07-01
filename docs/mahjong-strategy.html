@@ -1,3 +1,11 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0f2a24">
+<meta name="description" content="四麻・三麻の攻めと守りを体系立てて解説する麻雀上達ガイド（全18章）。負けない打ち方・押し引き・守備・ドラの扱い・読み・何切るまで。">
 <title>麻雀 上達ガイド ― 四麻・三麻の攻めと守り</title>
 <style>
   :root {
@@ -19,8 +27,14 @@
 
   * { box-sizing: border-box; }
 
+  html {
+    -webkit-text-size-adjust: 100%;   /* iOSで横向き時に本文が勝手に拡大されないように */
+    scroll-behavior: smooth;
+  }
+
   body {
     margin: 0;
+    overflow-x: hidden;               /* スマホで横スクロールが起きないように保険 */
     background:
       radial-gradient(120% 90% at 50% -10%, var(--felt-2) 0%, var(--felt) 55%, #0a1f1a 100%);
     color: var(--ink);
@@ -278,6 +292,8 @@
     @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
   }
 </style>
+</head>
+<body>
 
 <div class="hero">
   <p class="eyebrow">四麻 ・ 三麻 実戦戦術</p>
@@ -943,3 +959,6 @@
   </footer>
 
 </div>
+
+</body>
+</html>
