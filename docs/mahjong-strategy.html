@@ -1,0 +1,663 @@
+<title>麻雀 上達ガイド ― 四麻・三麻の攻めと守り</title>
+<style>
+  :root {
+    --felt:      #0f2a24;
+    --felt-2:    #143a30;
+    --ivory:     #f3ede0;
+    --ivory-2:   #ece3d2;
+    --ink:       #1c1a17;
+    --ink-soft:  #4a463d;
+    --vermil:    #c8402f;
+    --vermil-d:  #9c2c1f;
+    --gold:      #b98f36;
+    --line:      #d8cdb6;
+    --good:      #2f6d4f;
+    --warn:      #b9772a;
+    --jp-sans: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "YuGothic", "Noto Sans JP", "Meiryo", system-ui, sans-serif;
+    --jp-mincho: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", "Songti SC", serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(120% 90% at 50% -10%, var(--felt-2) 0%, var(--felt) 55%, #0a1f1a 100%);
+    color: var(--ink);
+    font-family: var(--jp-sans);
+    line-height: 1.85;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "palt" 1;
+  }
+
+  .wrap {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: clamp(1rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem) 6rem;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    text-align: center;
+    color: var(--ivory);
+    padding: clamp(2.5rem, 8vw, 5rem) 1rem clamp(2rem, 6vw, 3.5rem);
+  }
+  .hero .eyebrow {
+    font-size: .82rem;
+    letter-spacing: .42em;
+    text-indent: .42em;
+    color: var(--gold);
+    margin: 0 0 1.4rem;
+    font-weight: 600;
+  }
+  .hero h1 {
+    font-family: var(--jp-mincho);
+    font-weight: 600;
+    font-size: clamp(2.1rem, 7vw, 3.6rem);
+    line-height: 1.28;
+    margin: 0 0 1.2rem;
+    text-wrap: balance;
+    letter-spacing: .02em;
+  }
+  .hero h1 .accent { color: var(--vermil); }
+  .hero p.lede {
+    max-width: 34em;
+    margin: 0 auto;
+    color: #d7e0da;
+    font-size: 1.02rem;
+  }
+  .tiles-row {
+    display: flex;
+    justify-content: center;
+    gap: .5rem;
+    margin: 2.2rem auto 0;
+    flex-wrap: wrap;
+  }
+  .htile {
+    width: 40px; height: 56px;
+    background: linear-gradient(160deg, #fbf8f1, #e4dac4);
+    border-radius: 6px;
+    box-shadow: 0 4px 0 #b7a880, 0 8px 14px rgba(0,0,0,.35);
+    display: grid; place-items: center;
+    font-family: var(--jp-mincho);
+    font-size: 1.5rem;
+    color: var(--felt);
+  }
+  .htile.red { color: var(--vermil); }
+
+  /* ---------- Section ---------- */
+  section.card {
+    background: var(--ivory);
+    background-image: linear-gradient(180deg, #f6f1e6, var(--ivory));
+    border-radius: 14px;
+    padding: clamp(1.5rem, 4vw, 2.8rem);
+    margin: 1.4rem 0;
+    box-shadow: 0 1px 0 rgba(255,255,255,.5) inset, 0 18px 40px rgba(0,0,0,.28);
+    border: 1px solid #e7dcc4;
+  }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    border-bottom: 2px solid var(--line);
+    padding-bottom: .7rem;
+    margin-bottom: 1.4rem;
+  }
+  .sec-num {
+    font-family: var(--jp-mincho);
+    font-size: 2.4rem;
+    line-height: 1;
+    color: var(--vermil);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .sec-head h2 {
+    font-family: var(--jp-mincho);
+    font-size: clamp(1.35rem, 4vw, 1.8rem);
+    margin: 0;
+    font-weight: 600;
+    letter-spacing: .01em;
+  }
+  .sec-head .sub {
+    display: block;
+    font-family: var(--jp-sans);
+    font-size: .78rem;
+    letter-spacing: .2em;
+    color: var(--ink-soft);
+    margin-top: .3rem;
+    font-weight: 600;
+  }
+
+  h3 {
+    font-family: var(--jp-sans);
+    font-size: 1.12rem;
+    margin: 2rem 0 .6rem;
+    padding-left: .7rem;
+    border-left: 4px solid var(--vermil);
+    line-height: 1.4;
+  }
+  section.card > h3:first-of-type { margin-top: .4rem; }
+
+  p { margin: .7rem 0; }
+
+  ul, ol { padding-left: 1.3rem; margin: .7rem 0; }
+  li { margin: .4rem 0; }
+
+  strong { color: var(--vermil-d); font-weight: 700; }
+
+  /* chip for key terms */
+  .chip {
+    display: inline-block;
+    font-size: .86em;
+    background: var(--felt);
+    color: var(--ivory);
+    padding: .05em .55em;
+    border-radius: 5px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    white-space: nowrap;
+  }
+
+  /* callout: principle / maxim */
+  .callout {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    align-items: center;
+    background: #fff9f0;
+    border: 1px solid #eeceb6;
+    border-left: 5px solid var(--vermil);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin: 1.4rem 0;
+  }
+  .callout .mark {
+    font-family: var(--jp-mincho);
+    font-size: 1.7rem;
+    color: var(--vermil);
+    line-height: 1;
+  }
+  .callout .body { font-size: 1.02rem; }
+  .callout .body .t { font-weight: 700; font-family: var(--jp-mincho); font-size: 1.12rem; display:block; margin-bottom:.15rem; }
+
+  .note {
+    background: var(--felt);
+    color: #e7ede9;
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin: 1.3rem 0;
+    font-size: .96rem;
+  }
+  .note b { color: var(--gold); }
+
+  /* table */
+  .tbl-scroll { overflow-x: auto; margin: 1.2rem 0; border-radius: 10px; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 480px;
+    font-size: .93rem;
+    background: #fffdf8;
+  }
+  th, td {
+    border: 1px solid var(--line);
+    padding: .6rem .8rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: var(--felt);
+    color: var(--ivory);
+    font-weight: 600;
+    letter-spacing: .03em;
+  }
+  tbody tr:nth-child(even) td, tbody tr:nth-child(even) { background: #f6f1e6; }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+
+  /* two-col comparison */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.2rem 0; }
+  .col {
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--line);
+  }
+  .col.def { background: #eef4ef; border-color: #caddcf; }
+  .col.atk { background: #fdeee9; border-color: #edccbf; }
+  .col h4 { margin: 0 0 .5rem; font-size: 1.02rem; }
+  .col.def h4 { color: var(--good); }
+  .col.atk h4 { color: var(--vermil-d); }
+  @media (max-width: 620px) { .cols { grid-template-columns: 1fr; } }
+
+  /* mini table tiles inline */
+  .mtile {
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width: 1.6em; height: 1.9em; padding: 0 .2em;
+    margin: 0 .08em;
+    background: linear-gradient(160deg,#fbf8f1,#e8dfca);
+    border-radius: 4px; border:1px solid #cdbf9d;
+    font-family: var(--jp-mincho); font-size: .95em; color: var(--felt);
+    vertical-align: middle;
+  }
+  .mtile.r { color: var(--vermil); }
+
+  /* checklist */
+  .check { list-style: none; padding-left: 0; }
+  .check li { padding-left: 1.8rem; position: relative; }
+  .check li::before {
+    content: "✓"; position: absolute; left: 0; top: 0;
+    color: var(--good); font-weight: 900;
+  }
+
+  .toc {
+    background: var(--felt-2);
+    border: 1px solid #23483d;
+    border-radius: 12px;
+    padding: 1.3rem 1.5rem;
+    margin: 1.4rem 0 0;
+  }
+  .toc h2 { color: var(--gold); font-family: var(--jp-mincho); margin: 0 0 .8rem; font-size: 1.1rem; }
+  .toc ol { columns: 2; column-gap: 2rem; margin: 0; padding-left: 1.2rem; }
+  .toc a { color: #dbe4de; text-decoration: none; }
+  .toc a:hover, .toc a:focus { color: #fff; text-decoration: underline; }
+  @media (max-width: 620px){ .toc ol { columns: 1; } }
+
+  footer.foot {
+    text-align: center;
+    color: #9db2a8;
+    font-size: .85rem;
+    margin-top: 3rem;
+    line-height: 1.7;
+  }
+
+  a { color: var(--vermil-d); }
+  a:focus-visible, .toc a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 3px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    section.card { animation: rise .5s ease both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+
+<div class="hero">
+  <p class="eyebrow">四麻 ・ 三麻 実戦戦術</p>
+  <h1>麻雀は<span class="accent">負けない</span>ことから<br>強くなる</h1>
+  <p class="lede">「勝つ打ち方」より先に「大負けしない打ち方」。守りの土台の上に攻めを積む――四人麻雀と三人麻雀を、順位を取るための一貫した考え方で解説します。</p>
+  <div class="tiles-row" aria-hidden="true">
+    <span class="htile">一</span>
+    <span class="htile">九</span>
+    <span class="htile">東</span>
+    <span class="htile">中</span>
+    <span class="htile red">五</span>
+    <span class="htile">白</span>
+    <span class="htile">發</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="toc">
+    <h2>目次</h2>
+    <ol>
+      <li><a href="#s1">大原則 ― 麻雀は「失点管理」</a></li>
+      <li><a href="#s2">牌効率の基礎</a></li>
+      <li><a href="#s3">押し引き ― 最重要スキル</a></li>
+      <li><a href="#s4">守備技術（ベタオリの型）</a></li>
+      <li><a href="#s5">リーチ判断</a></li>
+      <li><a href="#s6">鳴き（副露）の判断</a></li>
+      <li><a href="#s7">点棒状況と順位取り</a></li>
+      <li><a href="#s8">四麻に特有の戦略</a></li>
+      <li><a href="#s9">三麻に特有の戦略</a></li>
+      <li><a href="#s10">メンタルと上達ロードマップ</a></li>
+    </ol>
+  </div>
+
+  <!-- 1 -->
+  <section class="card" id="s1">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2>大原則 ― 麻雀は「失点管理」のゲーム<span class="sub">MINDSET</span></h2>
+    </div>
+
+    <p>麻雀で長期的に勝つ人と負ける人の差は、「和了(あが)る力」よりも<strong>放銃(ほうじゅう＝振り込み)を減らす力</strong>で大きく開きます。1半荘の得失点の分散のうち、放銃による失点が占める割合はとても大きく、ここを抑えるだけで成績は安定します。</p>
+
+    <div class="callout">
+      <span class="mark">格</span>
+      <span class="body"><span class="t">まず「大きく負けない」、次に「小さく勝つ」</span>トップを狙う打ち方より、ラス(最下位)を回避する打ち方の方が、トータル収支への貢献が大きい。</span>
+    </div>
+
+    <h3>勝ち方の設計図：期待順位を上げる</h3>
+    <p>麻雀は点数の絶対値ではなく<strong>順位</strong>を競うゲーム（順位でウマ・オカが動く）です。したがって目標は「点数最大化」ではなく<strong>期待順位の最大化</strong>。これが全判断の背骨になります。</p>
+    <ul>
+      <li><strong>2着でも十分</strong>：無理にトップを狙って12,000点の勝負手に押して放銃するより、堅実に2着で終える方が期待値が高い場面は多い。</li>
+      <li><strong>ラス回避の価値が最大</strong>：特にラスの失点(ウマ・オカ)が重いルールでは、ラス目のときの攻め・オリの判断が成績を決める。</li>
+      <li><strong>点数状況で正解が変わる</strong>：同じ手牌・同じ相手リーチでも、東1局と南3局トップ目では取るべき行動は正反対になりうる。</li>
+    </ul>
+
+    <div class="note"><b>初心者が最初に直すべき1点：</b> 「せっかくここまで作ったから」で危険牌を切らないこと。手牌への未練（サンクコスト）が最大の失点源です。作った手の価値は、放銃したゼロになります。</div>
+  </section>
+
+  <!-- 2 -->
+  <section class="card" id="s2">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2>牌効率の基礎 ― 速く安全な手を作る<span class="sub">TILE EFFICIENCY</span></h2>
+    </div>
+
+    <p>攻守の判断以前に、そもそも手が速く整っていなければ選択肢が生まれません。牌効率＝<strong>受け入れ(有効牌)を最大化する打ち方</strong>は、すべての土台です。</p>
+
+    <h3>5ブロック理論</h3>
+    <p>アガリの形は「面子(メンツ)4つ＋雀頭(アタマ)1つ」＝<strong>5ブロック</strong>。手作りは「必要な5ブロックの候補が揃っているか」で考えます。</p>
+    <ul>
+      <li>ブロックが<strong>6個以上</strong>あるなら、一番弱い（伸びない・危険な）ブロックを削る。</li>
+      <li>ブロックが<strong>4個以下</strong>なら、孤立牌から新しいブロックの種を育てる。</li>
+      <li>迷ったら「その牌がどのブロックに属するか」を数える。どこにも属さない浮き牌が第一の切り候補。</li>
+    </ul>
+
+    <h3>良形と愚形</h3>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>形</th><th>例</th><th>待ち</th><th>受け入れ</th></tr></thead>
+        <tbody>
+          <tr><td>両面(リャンメン)</td><td><span class="mtile">3</span><span class="mtile">4</span> → 2・5待ち</td><td>広い・良形</td><td class="num">8枚</td></tr>
+          <tr><td>嵌張(カンチャン)</td><td><span class="mtile">3</span><span class="mtile">5</span> → 4待ち</td><td>狭い・愚形</td><td class="num">4枚</td></tr>
+          <tr><td>辺張(ペンチャン)</td><td><span class="mtile">1</span><span class="mtile">2</span> → 3待ち</td><td>狭い・愚形</td><td class="num">4枚</td></tr>
+          <tr><td>双碰(シャンポン)</td><td><span class="mtile">7</span><span class="mtile">7</span>＋<span class="mtile">白</span><span class="mtile">白</span></td><td>状況次第</td><td class="num">4枚</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>両面変化を残す</strong>のが基本方針。同じシャンテン数なら、最終形が両面になりやすい方を選ぶと和了率が上がります。カンチャン・ペンチャンは、埋まる前に両面へ変化させるか、リーチ・鳴きで押し切るかを早めに決める。</p>
+
+    <div class="callout">
+      <span class="mark">効</span>
+      <span class="body"><span class="t">ドラは1翻＝約2倍の価値</span>ドラ絡みの受け入れは多少効率を落としてでも残す価値がある。特に赤ドラのあるルールでは、赤5の周辺（<span class="mtile r">5</span>を含む形）を大切に。</span>
+    </div>
+
+    <h3>字牌の切り出し順</h3>
+    <p>序盤に不要な字牌を処理するなら、危険になる前が鉄則。おおまかな安全度＆残す価値の順で、<strong>ドラや役に絡まない客風→数牌の端に近い浮き牌</strong>の順で整理します。ただし後述の守備を考え、<strong>役牌の対子(トイツ)や一枚切れの字牌</strong>は終盤の安全牌として温存する価値もある。</p>
+  </section>
+
+  <!-- 3 -->
+  <section class="card" id="s3">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <h2>押し引き ― 麻雀で一番差がつく技術<span class="sub">PUSH &amp; FOLD</span></h2>
+    </div>
+
+    <p>相手からリーチや明確なテンパイ気配が入ったとき、<strong>押す(攻める)か引く(オリる)か</strong>。この一点に麻雀の実力差が最も表れます。感覚ではなく、次の3要素の掛け算で判断します。</p>
+
+    <div class="cols">
+      <div class="col atk">
+        <h4>押す条件（攻める）</h4>
+        <ul>
+          <li>自分も<strong>テンパイ or 好形1シャンテン</strong></li>
+          <li>手が高い（<strong>打点</strong>がある／ドラ・リーチ棒を回収できる）</li>
+          <li>待ちが<strong>良形</strong>で和了率が高い</li>
+          <li>切る牌が<strong>比較的安全</strong>（現物・スジ）</li>
+          <li>点棒状況的に<strong>アガリが必要</strong></li>
+        </ul>
+      </div>
+      <div class="col def">
+        <h4>引く条件（オリる）</h4>
+        <ul>
+          <li>手が<strong>2シャンテン以上</strong>で遠い</li>
+          <li>手が<strong>安い</strong>（リスクに見合わない）</li>
+          <li>待ちが<strong>愚形</strong>で和了が見込みにくい</li>
+          <li>切る牌が<strong>危険</strong>（無スジ・ドラ）</li>
+          <li><strong>トップ目・ラス回避圏</strong>で守るべき順位</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="mark">押</span>
+      <span class="body"><span class="t">「テンパイ vs テンパイ」なら基本は押し返す</span>相手がリーチでも、自分がテンパイしていて打点・待ちが見合うなら、無スジでも押すのが期待値。中途半端な形(1〜2シャンテン)で危険牌を切るのが最悪の選択。</span>
+    </div>
+
+    <h3>もっとも損な「ゼンツ」と「ビタオリしすぎ」</h3>
+    <p>両極端がどちらも損です。</p>
+    <ul>
+      <li><strong>何でも押す(全ツッパ)</strong>：手が遠い・安いのに押すと、放銃のリスクだけ膨らむ。</li>
+      <li><strong>臆病オリ</strong>：テンパイして打点もあるのに現物待ちで降り、和了機会を逃し続けると、じり貧でラスに沈む。</li>
+    </ul>
+    <p>目安として覚えやすいのは<strong>「シャンテンが同じなら、打点と待ちの良さで決める。1シャンテン以下に遠いなら基本オリ寄り」</strong>。</p>
+
+    <h3>回し打ち（現物を切りながら手を進める）</h3>
+    <p>完全オリと全ツッパの中間。<strong>安全牌を切りつつテンパイを目指す</strong>柔軟な打ち方です。手牌に安全牌を1〜2枚キープしておくと、リーチが来ても「安全牌を切りながら様子を見る→良い牌が来たら押す」という選択肢が生まれます。上級者はこの中間ゾーンの使い方が上手い。</p>
+  </section>
+
+  <!-- 4 -->
+  <section class="card" id="s4">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2>守備技術 ― ベタオリの「型」を持つ<span class="sub">DEFENSE</span></h2>
+    </div>
+
+    <p>オリると決めたら、<strong>放銃率をゼロに近づける</strong>技術で降りきる。守備は感覚ではなく手順です。安全度の高い順に牌を選びます。</p>
+
+    <h3>安全牌の優先順位</h3>
+    <ol>
+      <li><strong>現物(げんぶつ)</strong>：そのリーチ者が自分で切った牌＝ロン不可、100%安全。最優先。</li>
+      <li><strong>スジ(筋)</strong>：相手が切った牌の両面待ちを消す。例：<span class="mtile">4</span>切れなら <span class="mtile">1</span>・<span class="mtile">7</span> が両面(リャンメン)には当たらない（＝スジ）。ただしカンチャン・シャンポン・単騎には当たる点に注意。</li>
+      <li><strong>壁(ノーチャンス／ワンチャンス)</strong>：ある数牌が自分から4枚見えていれば、その牌を使う両面待ちは存在しえない。例：<span class="mtile">5</span>が4枚見え → <span class="mtile">6</span>を含む両面(<span class="mtile">6</span><span class="mtile">7</span>=5-8待ち等)の一部が消え、<span class="mtile">3</span>・<span class="mtile">7</span>の安全度が上がる。</li>
+      <li><strong>字牌</strong>：場に2枚切れ(＝残り1枚)の字牌は、単騎・シャンポンにしか当たらず比較的安全。</li>
+    </ol>
+
+    <div class="note"><b>スジの落とし穴：</b> 「スジだから安全」は<b>両面待ちに対してだけ</b>成立します。リーチ者が愚形（カンチャン・ペンチャン・単騎）待ちのとき、スジ牌は普通に当たる。スジは「両面には当たらない」であって「絶対安全」ではない、と正確に覚える。</div>
+
+    <h3>オリるときの手順</h3>
+    <ul class="check">
+      <li>まず現物を数える。<strong>2枚以上あれば当面は降りきれる</strong>。</li>
+      <li>現物が尽きる前に、次に安全な牌（スジ・壁・字牌）を確保しておく。</li>
+      <li><strong>複数人リーチ／複数テンパイ気配</strong>のときは、全員の現物（＝共通安全牌）を最優先で探す。</li>
+      <li>「安全牌がない」局面を作らないため、<strong>序盤から安全牌を1枚キープ</strong>する習慣をつける。</li>
+    </ul>
+
+    <div class="callout">
+      <span class="mark">守</span>
+      <span class="body"><span class="t">2軒リーチ・親リーチには特に慎重に</span>親の放銃は失点1.5倍。2軒に挟まれたら、多少手が良くても共通安全牌でベタオリするのが期待値になりやすい。</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="card" id="s5">
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <h2>リーチ判断 ― 押しの主砲をいつ撃つか<span class="sub">RIICHI</span></h2>
+    </div>
+
+    <p>リーチは最強の攻撃手段（打点上昇＋一発・裏ドラ＋相手へのプレッシャー）ですが、手を固定し自分も降りられなくするリスクがあります。基本は<strong>「テンパイしたら即リーチ」寄り</strong>で考え、例外だけ覚えるのが実戦的です。</p>
+
+    <h3>基本は「迷ったらリーチ」</h3>
+    <p>特に<strong>良形・そこそこの打点・序盤〜中盤</strong>のテンパイなら、リーチが最も期待値が高いことがほとんど。リーチによる打点上昇と相手を降ろす効果は、思っている以上に大きい。</p>
+
+    <h3>リーチを迷う／ダマ(黙聴)にする典型</h3>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>状況</th><th>判断の目安</th></tr></thead>
+        <tbody>
+          <tr><td>すでに高打点で確定役あり（例：メンタンピン＋ドラ）</td><td>ダマでも十分高い＋相手に警戒されず出やすい → <strong>ダマ有力</strong></td></tr>
+          <tr><td>役なしテンパイ</td><td>リーチしないと和了れない → <strong>リーチ</strong>（が基本）</td></tr>
+          <tr><td>愚形・安手・終盤</td><td>和了率が低く供託リスクだけ残る → <strong>状況によりダマ/オリ</strong></td></tr>
+          <tr><td>自分がトップ目のオーラス</td><td>リーチで無駄な勝負を呼ばない → <strong>ダマ or 和了放棄</strong></td></tr>
+          <tr><td>点数が欲しいラス目</td><td>打点最大化を優先 → <strong>積極リーチ</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="mark">攻</span>
+      <span class="body"><span class="t">先制リーチの価値は「アガリ＋守らせる」</span>先にリーチを打つと、相手の2〜3人が押し引き判断を迫られ降りてくれる。結果として自分の和了率も上がり、相手の和了も減る。スピードで先に立つことが最大の攻撃。</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="card" id="s6">
+    <div class="sec-head">
+      <span class="sec-num">06</span>
+      <h2>鳴き（副露）の判断<span class="sub">CALLING</span></h2>
+    </div>
+
+    <p>ポン・チーは手を速くしますが、<strong>①役があるか ②打点が残るか ③守備力を失わないか</strong>の3点を必ず確認します。役のない鳴きは和了れない（形式テンパイ狙いを除く）ので最悪です。</p>
+
+    <h3>鳴いて良い代表例</h3>
+    <ul>
+      <li><strong>役牌</strong>（自分の風・場風・三元牌）：1鳴きで即2翻級の価値。序盤でも積極的に。</li>
+      <li><strong>タンヤオ</strong>：ドラや赤が絡んで打点があるなら、鳴いてスピードアップが有力。</li>
+      <li><strong>ホンイツ・チャンタ等の染め手</strong>：鳴いても役が確定し、打点も残る。</li>
+      <li><strong>大三元・国士・混一など高打点</strong>や、<strong>親の連荘・ラス目の勝負</strong>で速度が欲しいとき。</li>
+    </ul>
+
+    <h3>鳴きの代償を忘れない</h3>
+    <p>鳴くと手牌が短くなり、<strong>安全牌を持てなくなる＝守備力が落ちる</strong>。中途半端な安手を鳴いて前進すると、相手のリーチにオリられず放銃、という最悪パターンに陥りやすい。「鳴いた後、危険が来たら降りられるか？」まで想像してから鳴く。</p>
+
+    <div class="note"><b>目安：</b> 「鳴いて2翻・良形・ドラ絡み」なら積極的に。「鳴いて1翻・愚形・打点なし」なら鳴かない方が良いことが多い。</div>
+  </section>
+
+  <!-- 7 -->
+  <section class="card" id="s7">
+    <div class="sec-head">
+      <span class="sec-num">07</span>
+      <h2>点棒状況と順位取り<span class="sub">SCORE &amp; RANK</span></h2>
+    </div>
+
+    <p>麻雀は<strong>局が進むほど「点数状況」が判断を支配</strong>します。特に南場（後半）・オーラスは、手牌よりも点差と順位で打ち方を決めます。</p>
+
+    <h3>局面別の基本方針</h3>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>自分の位置</th><th>方針</th></tr></thead>
+        <tbody>
+          <tr><td>トップ目（南場）</td><td>守備重視。リスクのある手は張らず、放銃と相手の大物手を防ぐ。局を消化して逃げ切る。</td></tr>
+          <tr><td>2〜3着</td><td>状況次第で攻守を切替。上との点差が縮む手なら押す、ラスに落ちる放銃は避ける。</td></tr>
+          <tr><td>ラス目</td><td>打点最大化・和了必須。多少のリスクを取ってでもアガリ／打点を狙う。ただし無意味な放銃は着順を固定するだけなので避ける。</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>オーラスの計算を習慣に</h3>
+    <p>オーラスは<strong>「何点の手をどこから和了れば何着になるか」</strong>を必ず計算します。</p>
+    <ul>
+      <li><strong>逆転に必要な打点</strong>を先に決め、そこから手作り・鳴き・リーチを逆算する。</li>
+      <li><strong>直撃(相手から直接ロン)</strong>で逆転できるなら、その相手の現物待ち・出やすい待ちを意識。</li>
+      <li>2着キープでよいなら無理をせず、条件を満たす最低限の手で妥協する。</li>
+    </ul>
+
+    <div class="callout">
+      <span class="mark">位</span>
+      <span class="body"><span class="t">「今アガると何着？」を毎巡問う</span>点数状況を把握していないと、せっかくのトップを自分から崩す（不要なリーチ・危険牌）ことになる。強者は常に着順を数えている。</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="card" id="s8">
+    <div class="sec-head">
+      <span class="sec-num">08</span>
+      <h2>四麻に特有の戦略<span class="sub">4-PLAYER</span></h2>
+    </div>
+
+    <p>4人麻雀は<strong>相手が3人</strong>いるぶん、放銃リスクと情報が多く、<strong>守備と押し引きの精度</strong>がそのまま成績に出ます。三麻に比べて手が安くなりやすく、局は長い（東南戦なら8局＋）ので、丁寧さが効きます。</p>
+
+    <h3>四麻で勝つための重心</h3>
+    <ul>
+      <li><strong>放銃を減らす</strong>のが最優先。3人相手なので、誰か一人にでも振れば失点。ベタオリ技術のリターンが大きい。</li>
+      <li><strong>リーチには2〜3人が反応</strong>する。先制リーチで複数人を降ろせる価値が三麻より大きい。</li>
+      <li><strong>役牌・タンヤオ・平和</strong>など軽い手での早い和了が、局を回して相手の高打点を潰す。</li>
+      <li><strong>親番</strong>の価値が高い（連荘＝加点＋他家に条件を押し付ける）。親のときは一段階攻め寄り、子の親リーチには一段階守り寄り。</li>
+    </ul>
+
+    <h3>局が長いぶん「オカ・ウマ」設計を意識</h3>
+    <p>東南戦は8局あり、序盤の1局はまだ取り返しがつく。<strong>東場は手なり・効率重視で無理をせず、南場で点数状況に応じてギアを上げる</strong>のが基本設計。序盤から高い手を無理に狙って放銃するのは、長い持ち時間を自ら削る行為。</p>
+
+    <div class="note"><b>三麻経験者が四麻で注意：</b> 四麻は打点が出にくく、ツモ和了より放銃回避の比重が高い。三麻の「攻めっ気」をそのまま持ち込むと放銃過多になりがち。一段階、守備に寄せる。</div>
+  </section>
+
+  <!-- 9 -->
+  <section class="card" id="s9">
+    <div class="sec-head">
+      <span class="sec-num">09</span>
+      <h2>三麻に特有の戦略<span class="sub">3-PLAYER</span></h2>
+    </div>
+
+    <p>3人麻雀は四麻とは別ゲームと言っていいほど性質が違います。萬子の2〜8を抜く（一・九のみ、または全抜き）ルールが多く、<strong>手が高くなりやすく・展開が速く・守備が難しい</strong>。攻撃力と押しの比重が上がります。</p>
+
+    <h3>三麻の構造的な特徴</h3>
+    <ul>
+      <li><strong>打点インフレ</strong>：ドラ・赤が多く、字牌や一九の対子から一気に高打点（ホンイツ・対々・混老頭など）が生まれる。満貫〜跳満が日常。</li>
+      <li><strong>ツモの価値が高い</strong>：相手が2人なので<strong>ツモ和了(自摸)</strong>の比率が上がり、ツモられ失点も大きい。ツモ和了を狙える手（門前・リーチ・ツモ）の価値が高い。</li>
+      <li><strong>守備が効きにくい</strong>：萬子が抜けている＆手が速いため、安全牌の候補が少なく、ベタオリしきれないことが多い。だからこそ<strong>先制して押し付ける</strong>側に回りたい。</li>
+      <li><strong>北(北family)の扱い</strong>：ルールにより「北抜き＝ドラ／役」になることが多い。抜きドラは打点源であると同時に、抜くタイミングで手の情報を与える点に注意。</li>
+    </ul>
+
+    <h3>三麻での攻めの重心</h3>
+    <div class="cols">
+      <div class="col atk">
+        <h4>攻め方</h4>
+        <ul>
+          <li><strong>スピードと打点の両取り</strong>。序盤から高打点の芽（字牌対子・染め・抜きドラ）を大切にする。</li>
+          <li><strong>先制リーチ・先制テンパイ</strong>を最優先。後手に回ると降りきれず放銃しやすい。</li>
+          <li><strong>ツモ和了</strong>を意識した門前・リーチ。放銃を待たずに自分で和了る。</li>
+        </ul>
+      </div>
+      <div class="col def">
+        <h4>守り方（限定的）</h4>
+        <ul>
+          <li>相手が2人だけなので<strong>共通安全牌が見つけやすい</strong>反面、手が高いので<strong>1発の放銃が致命傷</strong>。</li>
+          <li>降りると決めたら<strong>徹底</strong>する。中途半端が一番危険。</li>
+          <li>抜きドラや河から<strong>相手の打点</strong>を早めに読み、危険な相手を特定する。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="mark">三</span>
+      <span class="body"><span class="t">三麻は「先手・高打点・ツモ」のゲーム</span>四麻の守備感覚のまま打つと、速度負け・打点負けする。三麻では一段階攻めに寄せ、先にテンパイして相手に選択を迫るのが基本。ただし放銃は四麻以上に痛いので、押し引きの「引き」の精度も同時に問われる。</span>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section class="card" id="s10">
+    <div class="sec-head">
+      <span class="sec-num">10</span>
+      <h2>メンタルと上達ロードマップ<span class="sub">HOW TO IMPROVE</span></h2>
+    </div>
+
+    <h3>強くなるための心構え</h3>
+    <ul>
+      <li><strong>結果でなく判断で反省する</strong>：放銃しても、判断が正しければOK。逆に和了れても、押すべきでない場面で押していたら反省。麻雀は分散が大きく、1局の結果は運の影響が大きい。</li>
+      <li><strong>感情で打たない</strong>：連続で振り込んでも打ち方は変えない。「取り返そう」は最大の敵。</li>
+      <li><strong>長期で見る</strong>：数百半荘単位で成績を見る。1半荘・1日の上下に一喜一憂しない。</li>
+    </ul>
+
+    <h3>段階別・練習メニュー</h3>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>レベル</th><th>やること</th></tr></thead>
+        <tbody>
+          <tr><td>初級</td><td>役を覚える／5ブロックで手を作る／現物でオリる練習。まず「無スジを不用意に切らない」を徹底。</td></tr>
+          <tr><td>中級</td><td>押し引きの基準を持つ／スジ・壁で安全度を判断／リーチ即打ちと例外の使い分け／点数状況の把握。</td></tr>
+          <tr><td>上級</td><td>回し打ち・ベタオリの精度／相手の待ち読み／オーラスの条件計算／期待値ベースの押し引き微調整。</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>具体的な上達アクション</h3>
+    <ul class="check">
+      <li><strong>牌譜検討</strong>：自分の対局を後から見返し、放銃した局・押し引きを迷った局だけでも振り返る。</li>
+      <li><strong>何切る問題</strong>を日課にして牌効率の直感を鍛える。</li>
+      <li><strong>1冊、戦術書を通読</strong>する（押し引き・守備の体系が一気に整う）。</li>
+      <li><strong>ネット麻雀の段位戦</strong>で母数を稼ぎ、統計的に自分の弱点（放銃率・和了率・副露率）を把握する。</li>
+    </ul>
+
+    <div class="callout">
+      <span class="mark">要</span>
+      <span class="body"><span class="t">最短の上達＝「放銃率を下げる」</span>和了率を上げるより、放銃率を下げる方が習得が速く、成績への効果が大きい。まず守備を固め、その安全地帯の上で攻めの精度を磨く。この順番が遠回りに見えて最短。</span>
+    </div>
+  </section>
+
+  <footer class="foot">
+    麻雀 上達ガイド ― 四麻・三麻の攻めと守り<br>
+    ※ 具体的な点数・ウマオカ・北抜き等はルールにより異なります。お使いのルールに合わせて調整してください。
+  </footer>
+
+</div>
