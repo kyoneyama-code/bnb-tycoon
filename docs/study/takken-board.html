@@ -1,0 +1,520 @@
+<title>宅建士 逆算ボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --paper:#f1f2ec;
+    --surface:#fbfbf7;
+    --surface-2:#e9ebe3;
+    --ink:#1b2a44;
+    --ink-soft:#465470;
+    --muted:#7b8399;
+    --line:#d9dccf;
+    --seal:#c4472e;
+    --seal-soft:#e8d3cc;
+    --done:#5f7a4a;
+    --done-soft:#dde5d2;
+    --shadow:0 1px 2px rgba(27,42,68,.06),0 8px 24px -16px rgba(27,42,68,.28);
+    --serif:"Shippori Mincho B1",'Hiragino Mincho ProN','Yu Mincho',serif;
+    --sans:"Zen Kaku Gothic New",'Hiragino Sans','Yu Gothic',system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#12161f;--surface:#1a1f2b;--surface-2:#232a38;
+      --ink:#e8ebf1;--ink-soft:#b8c0cf;--muted:#848da0;--line:#2c3444;
+      --seal:#e2765c;--seal-soft:#432a25;
+      --done:#9dba76;--done-soft:#2a3325;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#12161f;--surface:#1a1f2b;--surface-2:#232a38;
+    --ink:#e8ebf1;--ink-soft:#b8c0cf;--muted:#848da0;--line:#2c3444;
+    --seal:#e2765c;--seal-soft:#432a25;
+    --done:#9dba76;--done-soft:#2a3325;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:15px;line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:0 16px 72px}
+
+  /* ---- header ---- */
+  header{
+    position:sticky;top:0;z-index:10;background:var(--paper);
+    border-bottom:1px solid var(--line);
+    padding:14px 0 12px;margin-bottom:22px;
+  }
+  .head-row{display:flex;align-items:center;gap:14px}
+  .seal{
+    flex:none;width:74px;height:74px;border-radius:50%;
+    border:2px solid var(--seal);color:var(--seal);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-family:var(--serif);line-height:1;
+  }
+  .seal .n{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums}
+  .seal .u{font-size:11px;letter-spacing:.18em;margin-top:4px}
+  .head-meta{flex:1;min-width:0}
+  .eyebrow{
+    font-size:11px;letter-spacing:.18em;color:var(--muted);
+    text-transform:uppercase;margin:0 0 2px;
+  }
+  h1{font-family:var(--serif);font-size:20px;font-weight:700;margin:0 0 8px;letter-spacing:.02em}
+  h1 span{color:var(--muted);font-size:13px;font-weight:500;margin-left:8px;letter-spacing:0}
+  .bar{height:7px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--done);border-radius:4px;transition:width .3s ease}
+  .bar-label{
+    display:flex;justify-content:space-between;font-size:12px;color:var(--muted);
+    margin-top:5px;font-variant-numeric:tabular-nums;
+  }
+
+  /* ---- today ---- */
+  .today{
+    background:var(--surface);border:1px solid var(--line);
+    border-left:4px solid var(--seal);border-radius:6px;
+    padding:16px 18px;box-shadow:var(--shadow);margin-bottom:26px;
+  }
+  .today h2{
+    font-family:var(--serif);font-size:15px;margin:0 0 2px;letter-spacing:.04em;
+  }
+  .today .sub{font-size:12px;color:var(--muted);margin-bottom:12px;font-variant-numeric:tabular-nums}
+
+  /* ---- task rows ---- */
+  .task{
+    display:flex;gap:11px;align-items:flex-start;padding:7px 0;cursor:pointer;
+    border:0;background:none;color:inherit;font:inherit;text-align:left;width:100%;
+  }
+  .task+.task{border-top:1px dashed var(--line)}
+  .box{
+    flex:none;width:19px;height:19px;margin-top:3px;border-radius:4px;
+    border:1.5px solid var(--muted);background:transparent;position:relative;transition:.15s;
+  }
+  .box::after{
+    content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;
+    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(42deg) scale(.4);
+    opacity:0;transition:.15s;
+  }
+  .task[aria-pressed="true"] .box{background:var(--done);border-color:var(--done)}
+  .task[aria-pressed="true"] .box::after{opacity:1;transform:rotate(42deg) scale(1)}
+  .task[aria-pressed="true"] .t-text{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+  .t-text{flex:1;font-size:14px;line-height:1.6}
+  .task:focus-visible{outline:2px solid var(--seal);outline-offset:2px;border-radius:4px}
+  .habit .t-text{color:var(--ink-soft);font-size:13px}
+
+  /* ---- weeks ---- */
+  h3.section{
+    font-family:var(--serif);font-size:13px;letter-spacing:.16em;color:var(--muted);
+    margin:0 0 12px;font-weight:500;
+  }
+  details.week{
+    background:var(--surface);border:1px solid var(--line);border-radius:6px;
+    margin-bottom:10px;overflow:hidden;
+  }
+  details.week[open]{box-shadow:var(--shadow)}
+  summary{
+    list-style:none;cursor:pointer;padding:13px 16px;display:flex;align-items:center;gap:12px;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary:focus-visible{outline:2px solid var(--seal);outline-offset:-2px}
+  .w-tag{
+    font-family:var(--serif);font-size:12px;font-weight:700;color:var(--seal);
+    background:var(--seal-soft);border-radius:3px;padding:2px 7px;flex:none;letter-spacing:.06em;
+  }
+  .w-main{flex:1;min-width:0}
+  .w-title{font-size:14px;font-weight:500;line-height:1.4}
+  .w-dates{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .w-meter{flex:none;width:44px;text-align:right;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .w-body{padding:0 16px 8px;border-top:1px solid var(--line)}
+  .day{padding:11px 0}
+  .day+.day{border-top:1px solid var(--line)}
+  .day-head{
+    display:flex;align-items:baseline;gap:8px;font-size:12px;color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  .day.is-today .day-head{color:var(--seal);font-weight:700}
+  .day.is-sun .dow{color:var(--seal)}
+  .day-note{font-size:12px;color:var(--muted);padding:2px 0 0 30px}
+
+  /* ---- strategy ---- */
+  table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+  th,td{padding:7px 8px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-size:11px;letter-spacing:.1em;color:var(--muted);font-weight:500}
+  td.num{text-align:right}
+  td.goal{text-align:right;font-family:var(--serif);font-weight:700}
+  tr.total td{border-bottom:0;font-weight:700}
+  .scroll{overflow-x:auto}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:4px 16px 12px;margin-bottom:10px}
+  .panel h4{font-family:var(--serif);font-size:14px;margin:14px 0 6px;letter-spacing:.04em}
+  .panel p,.panel li{font-size:13px;color:var(--ink-soft);margin:4px 0}
+  .panel ul{padding-left:18px;margin:6px 0}
+  textarea{
+    width:100%;min-height:110px;resize:vertical;font:inherit;font-size:13.5px;
+    background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:5px;
+    padding:10px 12px;line-height:1.7;
+  }
+  textarea:focus{outline:2px solid var(--seal);outline-offset:-1px}
+  .save-state{font-size:11px;color:var(--muted);height:16px;margin-top:4px}
+  footer{margin-top:28px;font-size:11.5px;color:var(--muted);line-height:1.8}
+  footer a{color:var(--ink-soft)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="head-row">
+      <div class="seal"><span class="n" id="days">–</span><span class="u">日</span></div>
+      <div class="head-meta">
+        <p class="eyebrow">2026.10.18 SUN 13:00–15:00</p>
+        <h1>宅建士 逆算ボード<span id="today-date"></span></h1>
+        <div class="bar"><i id="bar-all" style="width:0%"></i></div>
+        <div class="bar-label"><span id="pct-all">0%</span><span id="cnt-all">0 / 0</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="today" id="today-card"></section>
+
+  <h3 class="section">6週間の逆算</h3>
+  <div id="weeks"></div>
+
+  <h3 class="section" style="margin-top:28px">作戦</h3>
+  <div class="panel">
+    <h4>得点戦略（目標38点／近年の合格点 33〜38）</h4>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>科目</th><th class="num">出題</th><th class="num">目標</th><th>方針</th></tr></thead>
+        <tbody>
+          <tr><td>宅建業法（問26-45）</td><td class="num">20</td><td class="goal">18-20</td><td>最優先。時間の40%</td></tr>
+          <tr><td>法令上の制限（問15-22）</td><td class="num">8</td><td class="goal">6</td><td>数字の暗記ゲーム</td></tr>
+          <tr><td>免除科目（問46-50）</td><td class="num">5</td><td class="goal">4-5</td><td>登録講習なし＝全問受験。効率最強</td></tr>
+          <tr><td>税・その他（問23-25）</td><td class="num">3</td><td class="goal">2</td><td>頻出2〜3論点のみ</td></tr>
+          <tr><td>権利関係（問1-14）</td><td class="num">14</td><td class="goal">7</td><td>A論点のみ。深追い厳禁</td></tr>
+          <tr class="total"><td>合計</td><td class="num">50</td><td class="goal">37-40</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h4>3つの掟</h4>
+    <ul>
+      <li><strong>問題は解かない。</strong>問題文 → すぐ解答・解説。赤シートは3周目から</li>
+      <li><strong>書かない。</strong>ノートは作らない。ペンは○△×と付箋のためだけ</li>
+      <li><strong>1問1〜2分。</strong>悩んだら即答えを見て次へ。止まらないことが最優先</li>
+    </ul>
+    <h4>ランク付け（1周目に全問へ）</h4>
+    <p>頻度 A＝毎年出る／B＝2〜3年に一度／<strong>C＝やらない</strong>　難度 ++＝超基礎／+＝基礎／<strong>−＝やらない</strong></p>
+    <h4>1日のリズム</h4>
+    <div class="scroll">
+      <table>
+        <tbody>
+          <tr><td>起床直後</td><td class="num">5分</td><td>昨夜の内容を思い出す（見ずに）</td></tr>
+          <tr><td>移動中</td><td class="num">15-30分</td><td>アプリ・音読でながら学習</td></tr>
+          <tr><td>昼休み</td><td class="num">15分</td><td>1ページ1秒スキャン</td></tr>
+          <tr><td>夜メイン</td><td class="num">60-90分</td><td>その日のノルマ（答え→問題）</td></tr>
+          <tr><td>就寝30分前</td><td class="num">30分</td><td>数字・用語の暗記ピーク</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h4>当日の解く順序</h4>
+    <p>問26-45（業法）→ 問15-22（法令）→ 問46-50（免除）→ 問23-25（税）→ 問1-14（権利）。マークのズレだけは必ず確認。</p>
+  </div>
+
+  <h3 class="section" style="margin-top:28px">弱点メモ</h3>
+  <div class="panel" style="padding-top:14px">
+    <textarea id="notes" placeholder="付箋を貼った論点、何度も間違える数字、直前に見返したいこと"></textarea>
+    <div class="save-state" id="save-state"></div>
+  </div>
+
+  <footer>
+    主教材：2026年度版 みんなが欲しかった! 宅建士の論点別過去問題集（TAC出版・滝澤ななみ）<br>
+    メソッド：佐藤大和『ずるい暗記術』／登録講習なし・5問免除なしで作成
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var EXAM = "2026-10-18";
+  var HABIT = "夜5分の書き出し ／ 朝5分の思い出し";
+
+  function range(a,b){ return "問"+a+"〜"+b; }
+
+  var WEEKS = [
+    { tag:"W0", title:"仕込み（勉強はしない）", days:[
+      { d:"2026-09-05", tasks:["3分冊を取り外し、付箋・赤シート・ペンを用意","「令和7年度本試験」PDFをダウンロード（今は絶対に解かない）","学習アプリを入れて移動時間の枠を確保"] },
+      { d:"2026-09-06", tasks:["受験票の到着時期と会場を確認","宅建業法 第1章だけ答えを読む（着火・30分）"], note:"ここから43日。走る前に道具を揃えるだけの2日。" }
+    ]},
+    { tag:"W1", title:"宅建業法 1周目（1日16問）", habit:true, days:[
+      { d:"2026-09-07", tasks:["宅建業法 1周目 "+range(1,16)+"（答えを読む・ランク付け・付箋）"] },
+      { d:"2026-09-08", tasks:["宅建業法 1周目 "+range(17,32)] },
+      { d:"2026-09-09", tasks:["宅建業法 1周目 "+range(33,48)] },
+      { d:"2026-09-10", tasks:["宅建業法 1周目 "+range(49,64)] },
+      { d:"2026-09-11", tasks:["宅建業法 1周目 "+range(65,80)] },
+      { d:"2026-09-12", tasks:["宅建業法 1周目 "+range(81,96)] },
+      { d:"2026-09-13", tasks:["宅建業法 1周目 "+range(97,112),"遅れの回収 ／ 付箋箇所だけ再スキャン"], note:"1周目の目的は覚えることではなく、全体の地図とランク付けを終えること。" }
+    ]},
+    { tag:"W2", title:"業法2周目 ＋ 法令1周目", habit:true, days:[
+      { d:"2026-09-14", tasks:["宅建業法 2周目 "+range(1,24)+"（C・−は飛ばす）","法令上の制限 1周目 "+range(1,9)] },
+      { d:"2026-09-15", tasks:["宅建業法 2周目 "+range(25,48),"法令上の制限 1周目 "+range(10,18)] },
+      { d:"2026-09-16", tasks:["宅建業法 2周目 "+range(49,72),"法令上の制限 1周目 "+range(19,27)] },
+      { d:"2026-09-17", tasks:["宅建業法 2周目 "+range(73,96),"法令上の制限 1周目 "+range(28,36)] },
+      { d:"2026-09-18", tasks:["宅建業法 2周目 "+range(97,112),"法令上の制限 1周目 "+range(37,45)] },
+      { d:"2026-09-19", tasks:["法令上の制限 1周目 "+range(46,54),"宅建業法の付箋のみ 高速スキャン"] },
+      { d:"2026-09-20", tasks:["法令上の制限 1周目 "+range(55,63),"遅れの回収"], note:"就寝30分前は「数字だけ」の暗記ピークに固定する（面積・日数・階数）。" }
+    ]},
+    { tag:"W3", title:"法令2周目 ＋ 税その他 ＋ 権利1周目", habit:true, days:[
+      { d:"2026-09-21", tasks:["法令 2周目 "+range(1,9),"税・その他 1周目 "+range(1,7),"権利関係 A論点 1周目（意思表示・代理）"] },
+      { d:"2026-09-22", tasks:["法令 2周目 "+range(10,18),"税・その他 1周目 "+range(8,14),"権利関係 A論点 1周目（時効・物権変動）"] },
+      { d:"2026-09-23", tasks:["法令 2周目 "+range(19,27),"税・その他 1周目 "+range(15,21),"権利関係 A論点 1周目（抵当権・債務不履行）"] },
+      { d:"2026-09-24", tasks:["法令 2周目 "+range(28,36),"税・その他 1周目 "+range(22,28),"権利関係 A論点 1周目（売主の担保責任・賃貸借）"] },
+      { d:"2026-09-25", tasks:["法令 2周目 "+range(37,45),"税・その他 1周目 "+range(29,35)+"（免除：機構・景表法）","権利関係 A論点 1周目（借地借家法）"] },
+      { d:"2026-09-26", tasks:["法令 2周目 "+range(46,54),"税・その他 1周目 "+range(36,42)+"（免除：土地・建物）","権利関係 A論点 1周目（相続）"] },
+      { d:"2026-09-27", tasks:["法令 2周目 "+range(55,63),"税・その他 1周目 "+range(43,47),"権利関係 A論点 1周目（区分所有・不動産登記）","宅建業法の付箋のみ 1ページ1秒スキャン"], note:"免除科目は税・その他の分冊に同居。統計（問48）だけは飛ばす（W6で最新数値を詰める）。" }
+    ]},
+    { tag:"W4", title:"3周目 ＋ 初の通し（10/4）", habit:true, days:[
+      { d:"2026-09-28", tasks:["宅建業法 3周目 "+range(1,20)+"（付箋中心）","法令 3周目 "+range(1,16),"権利関係 2周目（意思表示〜時効）"] },
+      { d:"2026-09-29", tasks:["宅建業法 3周目 "+range(21,40),"法令 3周目 "+range(17,32),"権利関係 2周目（物権・抵当権）"] },
+      { d:"2026-09-30", tasks:["宅建業法 3周目 "+range(41,60),"法令 3周目 "+range(33,48),"権利関係 2周目（債務不履行・担保責任）"] },
+      { d:"2026-10-01", tasks:["宅建業法 3周目 "+range(61,80),"法令 3周目 "+range(49,63),"権利関係 2周目（賃貸借・借地借家）"] },
+      { d:"2026-10-02", tasks:["宅建業法 3周目 "+range(81,100),"税・その他 2周目 前半","権利関係 2周目（相続）"] },
+      { d:"2026-10-03", tasks:["宅建業法 3周目 "+range(101,112),"税・その他 2周目 後半","権利関係 2周目（区分所有・登記）"] },
+      { d:"2026-10-04", tasks:["13:00-15:00 令和7年度本試験を本番と同じ時間で通す","採点し、落とした論点を弱点メモに書き出す"], note:"この6週間で唯一「解く」日。30点前後で正常。点数に一喜一憂しない。" }
+    ]},
+    { tag:"W5", title:"弱点集中 ＋ 2回目の通し（10/11）", habit:true, days:[
+      { d:"2026-10-05", tasks:["付箋箇所のみ高速回転（1問30秒〜1分）","1ページ1秒スキャン：宅建業法の分冊","免除科目：住宅金融支援機構法のパターン暗記"] },
+      { d:"2026-10-06", tasks:["付箋箇所のみ高速回転","1ページ1秒スキャン：法令の分冊","免除科目：景品表示法（表示規約）のパターン暗記"] },
+      { d:"2026-10-07", tasks:["付箋箇所のみ高速回転","1ページ1秒スキャン：権利関係の分冊","免除科目：土地（造成地・埋立地・崖）"] },
+      { d:"2026-10-08", tasks:["付箋箇所のみ高速回転","1ページ1秒スキャン：税・その他の分冊","免除科目：建物（木造・鉄筋・基礎）"] },
+      { d:"2026-10-09", tasks:["10/4で落とした論点だけを潰す","宅建業法 4周目（付箋のみ）前半"] },
+      { d:"2026-10-10", tasks:["10/4で落とした論点だけを潰す","宅建業法 4周目（付箋のみ）後半"] },
+      { d:"2026-10-11", tasks:["13:00-15:00 2回目の通し（直近年度 or 12年過去問から1年分）","採点。目標35点以上"], note:"ここで35点に届かなくても捨てる範囲は増やさない。業法の精度だけを上げる。" }
+    ]},
+    { tag:"W6", title:"直前週（新規は入れない）", habit:true, days:[
+      { d:"2026-10-12", tasks:["宅建業法 5周目（付箋のみ）を1日で1周する勢いで"] },
+      { d:"2026-10-13", tasks:["宅建業法の弱点だけ ／ 権利関係のA論点を軽く回す"] },
+      { d:"2026-10-14", tasks:["宅建業法 最終確認（35条・37条書面、8種制限、報酬計算）"] },
+      { d:"2026-10-15", tasks:["法令の数字と税の税率を寝る前ピークで一気に"] },
+      { d:"2026-10-16", tasks:["統計（問48）の最新数値を暗記","免除科目の総確認"] },
+      { d:"2026-10-17", tasks:["会場までのルート・持ち物・時計を確認","宅建業法の付箋のみ1周","新規はやらない。早く寝る"] },
+      { d:"2026-10-18", tasks:["朝5分の思い出し","13:00 試験開始。業法 → 法令 → 免除 → 税 → 権利の順で解く"], note:"取れる所から確定させる。権利関係は最後に残った時間で。" }
+    ]}
+  ];
+
+  // ---- flatten ----
+  var DOW = ["日","月","火","水","木","金","土"];
+  var allDays = [], allKeys = [];
+  WEEKS.forEach(function(w,wi){
+    w.index = wi; w.keys = [];
+    w.days.forEach(function(day,di){
+      day.week = w;
+      day.items = day.tasks.map(function(t,ti){ return {key:"w"+wi+"d"+di+"t"+ti, text:t, habit:false}; });
+      if (w.habit) day.items.push({key:"w"+wi+"d"+di+"h", text:HABIT, habit:true});
+      day.items.forEach(function(it){ w.keys.push(it.key); allKeys.push(it.key); });
+      allDays.push(day);
+    });
+  });
+
+  function fmt(iso){
+    var p = iso.split("-");
+    var dt = new Date(+p[0], +p[1]-1, +p[2]);
+    return {m:+p[1], d:+p[2], dow:DOW[dt.getDay()], isSun:dt.getDay()===0, date:dt};
+  }
+  function todayISO(){
+    var n = new Date();
+    return n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0");
+  }
+
+  // ---- state ----
+  var state = {checks:{}, notes:""};
+  var LS = "takken-board-v1";
+  try { var raw = localStorage.getItem(LS); if (raw) state = JSON.parse(raw); } catch(e){}
+  if (!state.checks) state.checks = {};
+  var db = null, docRef = null, writeTimer = null, applying = false;
+
+  function persist(){
+    try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e){}
+    if (!docRef) return;
+    clearTimeout(writeTimer);
+    writeTimer = setTimeout(function(){
+      setSaveState("保存中…");
+      docRef.set({checks:state.checks, notes:state.notes, updatedAt:Date.now()})
+        .then(function(){ setSaveState("保存済み"); })
+        .catch(function(e){ setSaveState(e && e.code === "resource_exhausted" ? "混雑中。少し待って操作してください" : "この端末にのみ保存中"); });
+    }, 500);
+  }
+  var saveEl = document.getElementById("save-state");
+  var saveTimer = null;
+  function setSaveState(t){
+    saveEl.textContent = t;
+    clearTimeout(saveTimer);
+    if (t === "保存済み") saveTimer = setTimeout(function(){ saveEl.textContent = ""; }, 1800);
+  }
+
+  // ---- build ----
+  var today = todayISO();
+  var weeksEl = document.getElementById("weeks");
+
+  function taskButton(item){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "task" + (item.habit ? " habit" : "");
+    b.setAttribute("aria-pressed", "false");
+    b.dataset.key = item.key;
+    var box = document.createElement("span"); box.className = "box";
+    var tx = document.createElement("span"); tx.className = "t-text"; tx.textContent = item.text;
+    b.appendChild(box); b.appendChild(tx);
+    b.addEventListener("click", function(){ toggle(item.key); });
+    return b;
+  }
+
+  var currentWeek = WEEKS[0];
+  WEEKS.forEach(function(w){
+    var first = w.days[0].d, last = w.days[w.days.length-1].d;
+    if (today >= first && today <= last) currentWeek = w;
+    else if (today > last && w.index < WEEKS.length-1) currentWeek = WEEKS[w.index+1];
+  });
+
+  WEEKS.forEach(function(w){
+    var det = document.createElement("details");
+    det.className = "week";
+    if (w === currentWeek) det.open = true;
+    var f = fmt(w.days[0].d), l = fmt(w.days[w.days.length-1].d);
+    var sum = document.createElement("summary");
+    sum.innerHTML = '<span class="w-tag">'+w.tag+'</span>'+
+      '<span class="w-main"><span class="w-title">'+w.title+'</span><br>'+
+      '<span class="w-dates">'+f.m+'/'+f.d+'（'+f.dow+'） – '+l.m+'/'+l.d+'（'+l.dow+'）</span></span>'+
+      '<span class="w-meter" data-week="'+w.index+'">0/'+w.keys.length+'</span>';
+    det.appendChild(sum);
+    var body = document.createElement("div"); body.className = "w-body";
+    w.days.forEach(function(day){
+      var dd = document.createElement("div");
+      dd.className = "day" + (day.d === today ? " is-today" : "");
+      var ft = fmt(day.d);
+      if (ft.isSun) dd.className += " is-sun";
+      var h = document.createElement("div");
+      h.className = "day-head";
+      h.innerHTML = '<span>'+ft.m+'/'+ft.d+'</span><span class="dow">'+ft.dow+'</span>'+
+        (day.d === today ? '<span>← 今日</span>' : '');
+      dd.appendChild(h);
+      day.items.forEach(function(it){ dd.appendChild(taskButton(it)); });
+      if (day.note){
+        var n = document.createElement("div"); n.className = "day-note"; n.textContent = day.note;
+        dd.appendChild(n);
+      }
+      body.appendChild(dd);
+    });
+    det.appendChild(body);
+    weeksEl.appendChild(det);
+  });
+
+  // ---- today card ----
+  var cardEl = document.getElementById("today-card");
+  function buildTodayCard(){
+    cardEl.innerHTML = "";
+    var day = allDays.filter(function(d){ return d.d === today; })[0];
+    var h = document.createElement("h2");
+    var sub = document.createElement("p"); sub.className = "sub";
+    if (!day){
+      var future = allDays.filter(function(d){ return d.d > today; })[0];
+      if (!future){
+        h.textContent = "全日程 終了";
+        sub.textContent = "お疲れさまでした。合格発表は例年11月下旬。";
+        cardEl.appendChild(h); cardEl.appendChild(sub);
+        return;
+      }
+      day = future;
+      h.textContent = "次にやること";
+      var nf = fmt(day.d);
+      sub.textContent = nf.m+"月"+nf.d+"日（"+nf.dow+"）／"+day.week.tag+" "+day.week.title;
+    } else {
+      var tf = fmt(day.d);
+      h.textContent = "今日のノルマ";
+      sub.textContent = tf.m+"月"+tf.d+"日（"+tf.dow+"）／"+day.week.tag+" "+day.week.title;
+    }
+    cardEl.appendChild(h); cardEl.appendChild(sub);
+    day.items.forEach(function(it){ cardEl.appendChild(taskButton(it)); });
+    if (day.note){
+      var n = document.createElement("div");
+      n.className = "day-note"; n.style.paddingLeft = "0"; n.style.paddingTop = "10px";
+      n.textContent = day.note;
+      cardEl.appendChild(n);
+    }
+  }
+  buildTodayCard();
+
+  // ---- countdown ----
+  (function(){
+    var e = fmt(EXAM).date, n = new Date();
+    n.setHours(0,0,0,0);
+    var left = Math.round((e - n) / 86400000);
+    var el = document.getElementById("days");
+    if (left > 0) el.textContent = left;
+    else if (left === 0){ el.textContent = "当"; document.querySelector(".seal .u").textContent = "日"; }
+    else { el.textContent = "済"; document.querySelector(".seal .u").textContent = "了"; }
+    var tf = fmt(today);
+    document.getElementById("today-date").textContent = tf.m+"/"+tf.d+"（"+tf.dow+"）";
+  })();
+
+  // ---- sync DOM from state ----
+  function sync(){
+    var buttons = document.querySelectorAll(".task");
+    for (var i=0;i<buttons.length;i++){
+      var on = !!state.checks[buttons[i].dataset.key];
+      if ((buttons[i].getAttribute("aria-pressed") === "true") !== on)
+        buttons[i].setAttribute("aria-pressed", on ? "true" : "false");
+    }
+    var doneAll = 0;
+    WEEKS.forEach(function(w){
+      var c = 0;
+      w.keys.forEach(function(k){ if (state.checks[k]) c++; });
+      doneAll += c;
+      var m = document.querySelector('.w-meter[data-week="'+w.index+'"]');
+      if (m) m.textContent = c+"/"+w.keys.length;
+    });
+    var pct = allKeys.length ? Math.round(doneAll / allKeys.length * 100) : 0;
+    document.getElementById("bar-all").style.width = pct+"%";
+    document.getElementById("pct-all").textContent = pct+"% 完了";
+    document.getElementById("cnt-all").textContent = doneAll+" / "+allKeys.length;
+    var nt = document.getElementById("notes");
+    if (!applying && document.activeElement !== nt && nt.value !== (state.notes||"")) nt.value = state.notes || "";
+  }
+
+  function toggle(key){
+    if (state.checks[key]) delete state.checks[key];
+    else state.checks[key] = true;
+    sync();
+    persist();
+  }
+
+  var notesEl = document.getElementById("notes");
+  notesEl.value = state.notes || "";
+  notesEl.addEventListener("input", function(){ state.notes = notesEl.value; persist(); });
+
+  sync();
+
+  // ---- db (cross-device sync); the page works fully without it ----
+  if (window.claude && typeof window.claude.use === "function"){
+    window.claude.use("db").then(function(d){
+      if (!d) { setSaveState("この端末にのみ保存"); return; }
+      db = d;
+      docRef = db.doc("state/progress");
+      docRef.onSnapshot(function(snap){
+        if (!snap.exists) { persist(); return; }
+        var remote = snap.data() || {};
+        if (snap.metadata.hasPendingWrites) return;
+        applying = true;
+        state.checks = remote.checks || {};
+        if (typeof remote.notes === "string" && document.activeElement !== notesEl) state.notes = remote.notes;
+        applying = false;
+        try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e){}
+        sync();
+        buildTodayCard(); sync();
+      }, function(){ setSaveState("この端末にのみ保存"); });
+    }).catch(function(){});
+  } else {
+    setSaveState("この端末にのみ保存");
+  }
+})();
+</script>
