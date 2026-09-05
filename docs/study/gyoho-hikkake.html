@@ -1,0 +1,293 @@
+<title>業法 ひっかけ辞典</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --paper:#f1f2ec;--surface:#fbfbf7;--surface-2:#e9ebe3;
+    --ink:#1b2a44;--ink-soft:#465470;--muted:#7b8399;--line:#d9dccf;
+    --seal:#c4472e;--seal-soft:#f0dcd6;--done:#5f7a4a;--done-soft:#dde5d2;
+    --shadow:0 1px 2px rgba(27,42,68,.06),0 8px 24px -18px rgba(27,42,68,.3);
+    --serif:"Shippori Mincho B1",'Hiragino Mincho ProN','Yu Mincho',serif;
+    --sans:"Zen Kaku Gothic New",'Hiragino Sans','Yu Gothic',system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#12161f;--surface:#1a1f2b;--surface-2:#232a38;
+      --ink:#e8ebf1;--ink-soft:#b8c0cf;--muted:#848da0;--line:#2c3444;
+      --seal:#e2765c;--seal-soft:#3d2621;--done:#9dba76;--done-soft:#28321f;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -18px rgba(0,0,0,.9);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#12161f;--surface:#1a1f2b;--surface-2:#232a38;
+    --ink:#e8ebf1;--ink-soft:#b8c0cf;--muted:#848da0;--line:#2c3444;
+    --seal:#e2765c;--seal-soft:#3d2621;--done:#9dba76;--done-soft:#28321f;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -18px rgba(0,0,0,.9);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:0 15px 72px}
+
+  header{position:sticky;top:0;z-index:10;background:var(--paper);border-bottom:1px solid var(--line);padding:14px 0 10px}
+  .eyebrow{font-size:11px;letter-spacing:.18em;color:var(--muted);margin:0 0 3px}
+  h1{font-family:var(--serif);font-size:21px;font-weight:700;margin:0 0 3px;letter-spacing:.02em}
+  .lede{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+  .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+  .chip{
+    flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);
+    font:inherit;font-size:12.5px;padding:4px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;
+  }
+  .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .chip:focus-visible{outline:2px solid var(--seal);outline-offset:2px}
+  .count{font-size:11.5px;color:var(--muted);margin-top:7px;font-variant-numeric:tabular-nums;display:flex;justify-content:space-between}
+
+  h2.sec{
+    font-family:var(--serif);font-size:14px;letter-spacing:.1em;color:var(--ink);
+    margin:26px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--line);font-weight:700;
+  }
+  .item{
+    background:var(--surface);border:1px solid var(--line);border-radius:6px;
+    padding:11px 13px;margin-bottom:8px;box-shadow:var(--shadow);
+  }
+  .item.mastered{opacity:.5}
+  .line{display:flex;gap:9px;align-items:flex-start;font-size:14px;line-height:1.62}
+  .line+.line{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}
+  .mark{flex:none;font-family:var(--serif);font-weight:700;font-size:15px;width:15px;text-align:center;line-height:1.5}
+  .x .mark{color:var(--seal)}
+  .o .mark{color:var(--done)}
+  .x .txt{color:var(--ink-soft)}
+  .o .txt{color:var(--ink);font-weight:500}
+  .foot{display:flex;align-items:center;gap:8px;margin-top:9px}
+  .tag{
+    font-size:10.5px;letter-spacing:.08em;padding:2px 7px;border-radius:3px;
+    background:var(--surface-2);color:var(--muted);flex:none;
+  }
+  .tag.t-改正{background:var(--seal-soft);color:var(--seal)}
+  .mbtn{
+    margin-left:auto;border:1px solid var(--line);background:transparent;color:var(--muted);
+    font:inherit;font-size:11.5px;padding:3px 10px;border-radius:999px;cursor:pointer;flex:none;
+  }
+  .item.mastered .mbtn{background:var(--done-soft);border-color:var(--done);color:var(--done)}
+  .mbtn:focus-visible{outline:2px solid var(--seal);outline-offset:2px}
+
+  .note{
+    background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--seal);
+    border-radius:6px;padding:13px 15px;margin:22px 0 0;font-size:13.5px;color:var(--ink-soft);
+  }
+  .note strong{color:var(--ink)}
+  .note h3{font-family:var(--serif);font-size:14px;margin:0 0 6px;color:var(--ink)}
+  .empty{color:var(--muted);font-size:13.5px;padding:20px 0;text-align:center}
+  footer{margin-top:26px;font-size:11.5px;color:var(--muted);line-height:1.8}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">宅建業法 20問 / 直前3日で回す</p>
+    <h1>業法 ひっかけ辞典</h1>
+    <p class="lede">誤り肢は「数字違い・主語違い・例外の見落とし」の3つしかない。× を読んで ○ を言えるかで判定する。</p>
+    <div class="chips" id="chips"></div>
+    <div class="count"><span id="showing"></span><span id="mastered"></span></div>
+  </header>
+
+  <div id="list"></div>
+
+  <div class="note">
+    <h3>おまけ：2026年度の権利関係</h3>
+    <strong>区分所有法が2026年4月1日施行で大きく変わりました</strong>（集会の決議要件の緩和、管理不全マンションの財産管理制度、国内管理人）。
+    権利関係は7点狙いで深追いしない方針ですが、区分所有は毎年1問出るA論点かつ改正直後。ここだけは教材の改正情報PDFで最新版を確認してください。
+  </div>
+
+  <footer>
+    根拠：宅地建物取引業法／同施行規則／報酬告示（令和6年7月1日改正）。2026年度試験の法令基準日は2026年4月1日。<br>
+    数字と結論のみを載せています。条文番号は覚えなくて構いません。
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  // [section, tag, 誤り, 正しい]
+  var D = [
+  ["免許","数字","免許の更新申請は、有効期間満了の30日前までに行えばよい","有効期間満了の90日前から30日前までの間に申請。処分がなければ従前の免許は満了後も効力を持つ"],
+  ["免許","数字","免許換えをすると、新しい免許は前の免許の残りの期間だけ有効","免許換え後は新たに5年"],
+  ["免許","数字","廃業の届出は廃業の日から2週間以内","30日以内。死亡だけは相続人が知った日から30日以内"],
+  ["免許","主語","事務所を1つ増やしたので免許換えが必要になる","同一都道府県内なら変更の届出だけ。都道府県をまたぐ・大臣免許になるときが免許換え"],
+  ["免許","例外","破産手続開始の決定を受けた者は、復権しても5年間は免許を受けられない","復権すれば直ちに免許を受けられる（5年待ちは不要）"],
+  ["免許","数字","宅建業法違反で罰金刑を受けた者は3年間免許を受けられない","5年間"],
+
+  ["宅建士","数字","宅建士証の有効期間は3年","5年。交付申請前6ヶ月以内の法定講習を受ける"],
+  ["宅建士","例外","登録の移転をしたときも法定講習を受けなければならない","不要。移転後の宅建士証の有効期間は従前の残存期間"],
+  ["宅建士","主語","重要事項の説明では、請求があったときに宅建士証を提示すればよい","請求がなくても必ず提示。取引関係者から請求があったときも提示"],
+  ["宅建士","主語","従業者証明書の代わりに宅建士証を提示すればよい","別物。従業者証明書は必ず携帯し、請求があれば提示"],
+  ["宅建士","数字","住所を変更したときは30日以内に変更の登録を申請する","遅滞なく申請。30日以内なのは死亡等の届出の方"],
+  ["宅建士","例外","住所を他県に移したので登録の移転ができる","住所ではできない。勤務先の業者の事務所が他県になったときなど"],
+
+  ["営業保証金","数字","主たる事務所1000万円、支店も1つにつき1000万円","主たる事務所1000万円、その他の事務所は1つにつき500万円"],
+  ["営業保証金","主語","供託すれば事業を開始できる","供託した旨を免許権者に届け出た後でなければ開始できない"],
+  ["営業保証金","数字","還付があったときは、通知の日から30日以内に不足額を供託する","通知を受けた日から2週間以内に供託し、供託した日から2週間以内に届出"],
+  ["営業保証金","例外","営業保証金は金銭で供託しなければならない","有価証券でも可（国債100%、地方債・政府保証債90%、その他80%で評価）"],
+  ["営業保証金","数字","取戻しには3ヶ月以上の期間を定めた公告が必要","6ヶ月以上。保証協会に加入した場合などは公告不要"],
+
+  ["保証協会","数字","分担金は主たる事務所100万円、その他50万円","60万円／30万円"],
+  ["保証協会","主語","保証協会の社員も営業保証金を供託しなければならない","不要。分担金の納付で足りる"],
+  ["保証協会","数字","還付充当金は通知を受けてから1ヶ月以内に納付する","2週間以内。納付しないと社員の地位を失う"],
+  ["保証協会","数字","社員の地位を失ったときは2週間以内に営業保証金を供託する","1週間以内"],
+  ["保証協会","例外","還付を受けられる限度は納付した分担金の額まで","営業保証金に相当する額（主たる事務所1000万円等）まで"],
+  ["保証協会","数字","社員が新たに事務所を設置したときは1ヶ月以内に分担金を納付","2週間以内"],
+
+  ["媒介契約","数字","専任媒介契約の有効期間は6ヶ月を超えてはならない","3ヶ月。超える定めは3ヶ月に短縮される。自動更新の特約は無効"],
+  ["媒介契約","数字","専任は5日以内、専属専任は7日以内にレインズへ登録","逆。専任7日以内、専属専任5日以内（いずれも休業日を除く）"],
+  ["媒介契約","数字","専任は1週間に1回以上、専属専任は2週間に1回以上報告","逆。専任は2週間に1回以上、専属専任は1週間に1回以上（口頭でも可）"],
+  ["媒介契約","主語","媒介契約書面には宅建士の記名が必要","宅建業者が記名する。宅建士は関与しない"],
+  ["媒介契約","例外","価額について意見を述べるときは、根拠を書面で示さなければならない","根拠の明示は必要だが、口頭でもよい"],
+  ["媒介契約","例外","一般媒介契約でもレインズ登録と業務報告が義務づけられる","一般には登録義務も報告義務もない"],
+
+  ["広告・業務規制","例外","貸借の媒介なら、建築確認前でも広告してよい","広告は売買・貸借を問わず不可。貸借の代理・媒介で例外なのは契約締結の制限の方"],
+  ["広告・業務規制","主語","誇大広告でも、実際に誰も損害を受けていなければ違反にならない","被害の有無に関係なく違反。おとり広告も同じ"],
+  ["広告・業務規制","主語","取引態様の明示は広告のときだけでよい","広告時と、注文を受けたときに遅滞なく、両方必要"],
+  ["広告・業務規制","例外","手付について貸付けをして契約を誘引しても、後で返してもらえば問題ない","手付の貸付け・分割払いによる誘引は、契約に至らなくても違反"],
+
+  ["35条書面","主語","重要事項説明書は売主にも交付しなければならない","取得者・借主（買主等）に対して交付・説明する。売主には不要"],
+  ["35条書面","例外","相手方が宅建業者でも説明を省略できない","業者間では書面の交付だけでよく、説明は省略できる"],
+  ["35条書面","例外","重要事項の説明は契約後遅滞なく行えばよい","契約が成立するまでの間に行う"],
+  ["35条書面","主語","重要事項の説明と記名は専任の宅建士がしなければならない","宅建士であればよく、専任である必要はない"],
+  ["35条書面","例外","区分所有建物の管理費の額は説明事項ではない","説明事項。滞納があればその額も説明する"],
+
+  ["37条書面","主語","37条書面も宅建士が説明しなければならない","記名は必要だが、説明は不要"],
+  ["37条書面","主語","37条書面は買主にだけ交付する","契約の両当事者に交付する"],
+  ["37条書面","例外","損害賠償額の予定は必ず記載しなければならない","定めがあるときに記載する任意的記載事項。引渡時期と登記申請時期は必ず記載"],
+  ["37条書面","数字","37条書面は契約後7日以内に交付する","契約が成立したら遅滞なく"],
+
+  ["8種制限","主語","買主が宅建業者でも8種制限は適用される","自ら売主で、かつ相手方が非業者のときだけ適用"],
+  ["8種制限","数字","クーリングオフは告げられた日から10日以内","8日を経過するまで。書面で告げられていなければ期間は進行しない"],
+  ["8種制限","例外","買主が自宅で申込みをした場合もクーリングオフできる","買主が自ら自宅・勤務先を指定したときはできない"],
+  ["8種制限","例外","代金を全額支払っていてもクーリングオフできる","引渡しと代金全額支払の両方が揃うとできない"],
+  ["8種制限","数字","クーリングオフは書面が業者に到達したときに効力が生じる","書面を発した時（発信主義）"],
+  ["8種制限","数字","損害賠償額の予定は代金の30%まで","予定額と違約金の合計で20%まで。超える部分が無効"],
+  ["8種制限","数字","手付金等の保全は、未完成10%・完成5%を超えるとき","逆。未完成は5%または1000万円超、完成物件は10%または1000万円超"],
+  ["8種制限","例外","他人の物件を売買する契約は絶対に締結できない","取得する契約（予約を含む）を締結していれば可。停止条件付では不可"],
+  ["8種制限","数字","契約不適合の通知期間を「引渡しから1年」とする特約は有効","2年以上でなければ無効となり、民法の原則（知った時から1年）に戻る"],
+  ["8種制限","数字","割賦販売の解除は、20日以上の期間を定めて催告する","30日以上の期間を定めて書面で催告する"],
+
+  ["報酬","数字","代金1000万円の売買を媒介して、双方から合計36万円まで受け取れる","一方から36万円×1.1＝39.6万円。双方を媒介すれば合計79.2万円まで"],
+  ["報酬","例外","居住用建物の賃貸で、貸主から借賃1ヶ月分を受け取れる","承諾がなければ各0.5ヶ月分×1.1。合計で借賃1ヶ月分×1.1が上限"],
+  ["報酬","改正","低廉な空家等の特例は400万円以下で、売主からのみ受け取れる","2024年7月改正で800万円以下・売主買主の双方から30万円×1.1まで（事前の説明と合意が必要）"],
+  ["報酬","改正","長期の空家等の貸借でも、報酬は借賃1ヶ月分×1.1が上限","貸主からは借賃2ヶ月分×1.1まで受け取れる（合意が必要）"],
+  ["報酬","例外","依頼者の依頼によらない広告費も、実費なら別途請求できる","依頼者の依頼による広告費だけが報酬とは別に請求できる"],
+
+  ["事務所・案内所","数字","専任の宅建士は業務従事者3人に1人以上","事務所は5人に1人以上。申込み・契約をする案内所は1人以上"],
+  ["事務所・案内所","数字","申込みを受ける案内所は、業務開始の5日前までに届け出る","10日前までに、免許権者と所在地の知事の両方へ"],
+  ["事務所・案内所","例外","案内所には必ず専任の宅建士を置かなければならない","申込み・契約をしない案内所は標識だけでよい（届出も専任宅建士も不要）"],
+  ["事務所・案内所","数字","帳簿は取引終了後3年間保存する","各事業年度末で閉鎖し、閉鎖後5年（自ら売主となる新築住宅は10年）"],
+  ["事務所・案内所","数字","従業者名簿は最終記載から5年保存する","10年"],
+
+  ["監督処分","主語","知事は、他県の免許業者に対して処分できない","業務地の知事も指示処分・業務停止処分ができる。免許取消しだけは免許権者のみ"],
+  ["監督処分","数字","業務停止処分は最長6ヶ月","1年以内"],
+
+  ["2026年改正","改正","35条・37条書面には宅建士の記名押印が必要","押印は不要。記名のみでよい"],
+  ["2026年改正","改正","35条・37条書面は必ず紙で交付しなければならない","相手方の承諾があれば電磁的方法で提供できる"],
+  ["2026年改正","改正","IT重説では宅建士証の提示を省略できる","画面上での提示が必要。省略はできない"]
+  ];
+
+  var TAGS = ["数字","主語","例外","改正"];
+  var state = {mastered:{}};
+  var LS = "gyoho-hikkake-v1";
+  try { var raw = localStorage.getItem(LS); if (raw) state = JSON.parse(raw); } catch(e){}
+  if (!state.mastered) state.mastered = {};
+  var docRef = null, timer = null;
+
+  function persist(){
+    try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e){}
+    if (!docRef) return;
+    clearTimeout(timer);
+    timer = setTimeout(function(){
+      docRef.set({mastered:state.mastered, updatedAt:Date.now()}).catch(function(){});
+    }, 500);
+  }
+
+  var filter = "all", hideMastered = false;
+  var chipsEl = document.getElementById("chips");
+  function addChip(label, value){
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = label;
+    b.setAttribute("aria-pressed", value === filter ? "true" : "false");
+    b.dataset.value = value;
+    b.addEventListener("click", function(){
+      if (value === "hide"){ hideMastered = !hideMastered; b.setAttribute("aria-pressed", hideMastered?"true":"false"); }
+      else {
+        filter = value;
+        chipsEl.querySelectorAll('.chip').forEach(function(c){
+          if (c.dataset.value !== "hide") c.setAttribute("aria-pressed", c.dataset.value === filter ? "true":"false");
+        });
+      }
+      render();
+    });
+    chipsEl.appendChild(b);
+  }
+  addChip("すべて","all");
+  TAGS.forEach(function(t){ addChip(t, t); });
+  addChip("未マスターのみ","hide");
+
+  var listEl = document.getElementById("list");
+
+  function render(){
+    listEl.innerHTML = "";
+    var shown = 0, lastSec = null, secWrap = null;
+    D.forEach(function(row, i){
+      var sec = row[0], tag = row[1];
+      var key = "i"+i;
+      var isM = !!state.mastered[key];
+      if (filter !== "all" && tag !== filter) return;
+      if (hideMastered && isM) return;
+      shown++;
+      if (sec !== lastSec){
+        var h = document.createElement("h2");
+        h.className = "sec"; h.textContent = sec;
+        listEl.appendChild(h);
+        lastSec = sec;
+      }
+      var it = document.createElement("div");
+      it.className = "item" + (isM ? " mastered" : "");
+      it.innerHTML =
+        '<div class="line x"><span class="mark">×</span><span class="txt"></span></div>' +
+        '<div class="line o"><span class="mark">○</span><span class="txt"></span></div>' +
+        '<div class="foot"><span class="tag t-'+tag+'">'+tag+'</span>' +
+        '<button type="button" class="mbtn">'+(isM ? "覚えた" : "覚えた？")+'</button></div>';
+      it.querySelector(".x .txt").textContent = row[2];
+      it.querySelector(".o .txt").textContent = row[3];
+      it.querySelector(".mbtn").addEventListener("click", function(){
+        if (state.mastered[key]) delete state.mastered[key];
+        else state.mastered[key] = true;
+        persist(); render();
+      });
+      listEl.appendChild(it);
+    });
+    if (!shown){
+      var e = document.createElement("p");
+      e.className = "empty"; e.textContent = "この条件に残っているものはありません。";
+      listEl.appendChild(e);
+    }
+    var m = 0;
+    for (var k in state.mastered) if (state.mastered[k]) m++;
+    document.getElementById("showing").textContent = "表示 "+shown+" / 全 "+D.length+" 肢";
+    document.getElementById("mastered").textContent = "覚えた "+m+" / "+D.length;
+  }
+  render();
+
+  if (window.claude && typeof window.claude.use === "function"){
+    window.claude.use("db").then(function(db){
+      if (!db) return;
+      docRef = db.doc("state/mastered");
+      docRef.onSnapshot(function(snap){
+        if (!snap.exists || snap.metadata.hasPendingWrites) return;
+        var r = snap.data() || {};
+        state.mastered = r.mastered || {};
+        try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e){}
+        render();
+      }, function(){});
+    }).catch(function(){});
+  }
+})();
+</script>
