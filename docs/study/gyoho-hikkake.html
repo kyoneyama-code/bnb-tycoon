@@ -66,7 +66,8 @@
   .tag.t-改正{background:var(--seal-soft);color:var(--seal)}
   .mbtn{
     margin-left:auto;border:1px solid var(--line);background:transparent;color:var(--muted);
-    font:inherit;font-size:11.5px;padding:3px 10px;border-radius:999px;cursor:pointer;flex:none;
+    font:inherit;font-size:11.5px;padding:5px 12px;border-radius:999px;cursor:pointer;flex:none;
+    touch-action:manipulation;-webkit-tap-highlight-color:rgba(196,71,46,.15);-webkit-appearance:none;
   }
   .item.mastered .mbtn{background:var(--done-soft);border-color:var(--done);color:var(--done)}
   .mbtn:focus-visible{outline:2px solid var(--seal);outline-offset:2px}
@@ -108,7 +109,7 @@
 
   <footer>
     根拠：宅地建物取引業法／同施行規則／報酬告示（令和6年7月1日改正）／都市計画法・建築基準法・国土利用計画法・農地法・盛土規制法・土地区画整理法。2026年度試験の法令基準日は2026年4月1日。<br>
-    数字と結論のみを載せています。条文番号は覚えなくて構いません。
+    数字と結論のみを載せています。条文番号は覚えなくて構いません。<br><span style="font-variant-numeric:tabular-nums">版 v3 ・ 2026-09-06</span>
   </footer>
 </div>
 
@@ -340,9 +341,11 @@
       it.querySelector(".x .txt").textContent = row[2];
       it.querySelector(".o .txt").textContent = row[3];
       it.querySelector(".mbtn").addEventListener("click", function(){
-        if (state.mastered[key]) delete state.mastered[key];
-        else state.mastered[key] = true;
-        persist(); render();
+        var on = !state.mastered[key];
+        if (on) state.mastered[key] = true; else delete state.mastered[key];
+        it.className = "item" + (on ? " mastered" : "");
+        try { persist(); } catch(e){}
+        try { render(); } catch(e){}
       });
       listEl.appendChild(it);
     });

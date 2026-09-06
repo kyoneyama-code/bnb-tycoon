@@ -85,13 +85,15 @@
 
   /* ---- task rows ---- */
   .task{
-    display:flex;gap:11px;align-items:flex-start;padding:7px 0;cursor:pointer;
+    display:flex;gap:11px;align-items:flex-start;padding:9px 0;cursor:pointer;
+    touch-action:manipulation;-webkit-tap-highlight-color:rgba(196,71,46,.15);-webkit-appearance:none;
+    min-height:38px;
     border:0;background:none;color:inherit;font:inherit;text-align:left;width:100%;
   }
   .task+.task{border-top:1px dashed var(--line)}
   .box{
     flex:none;width:19px;height:19px;margin-top:3px;border-radius:4px;
-    border:1.5px solid var(--muted);background:transparent;position:relative;transition:.15s;
+    border:1.5px solid var(--muted);background:transparent;position:relative;transition:.15s;pointer-events:none;
   }
   .box::after{
     content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;
@@ -101,7 +103,7 @@
   .task[aria-pressed="true"] .box{background:var(--done);border-color:var(--done)}
   .task[aria-pressed="true"] .box::after{opacity:1;transform:rotate(42deg) scale(1)}
   .task[aria-pressed="true"] .t-text{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
-  .t-text{flex:1;font-size:14px;line-height:1.6}
+  .t-text{flex:1;font-size:14px;line-height:1.6;pointer-events:none}
   .task:focus-visible{outline:2px solid var(--seal);outline-offset:2px;border-radius:4px}
   .habit .t-text{color:var(--ink-soft);font-size:13px}
 
@@ -314,7 +316,8 @@
   <footer>
     主教材：2026年度版 みんなが欲しかった! 宅建士の論点別過去問題集（TAC出版・滝澤ななみ）<br>
     副教材：同シリーズ 12年過去問題集（年度別。10/4以降の通し5回に使用）<br>
-    メソッド：佐藤大和『ずるい暗記術』／登録講習なし・5問免除なしで作成
+    メソッド：佐藤大和『ずるい暗記術』／登録講習なし・5問免除なしで作成<br>
+    <span style="font-variant-numeric:tabular-nums">版 v5 ・ 2026-09-06</span>
   </footer>
 </div>
 
@@ -458,7 +461,7 @@
     var box = document.createElement("span"); box.className = "box";
     var tx = document.createElement("span"); tx.className = "t-text"; tx.textContent = item.text;
     b.appendChild(box); b.appendChild(tx);
-    b.addEventListener("click", function(){ toggle(item.key); });
+    b.addEventListener("click", function(){ toggle(item.key, b); });
     return b;
   }
 
@@ -571,19 +574,23 @@
     document.getElementById("pct-all").textContent = pct+"% 完了";
     document.getElementById("cnt-all").textContent = doneAll+" / "+allKeys.length;
     var nt = document.getElementById("notes");
-    if (document.activeElement !== nt && nt.value !== (state.notes||"")) nt.value = state.notes || "";
+    if (nt && document.activeElement !== nt && nt.value !== (state.notes||"")) nt.value = state.notes || "";
   }
 
-  function toggle(key){
-    if (state.checks[key]) delete state.checks[key];
-    else state.checks[key] = true;
-    sync();
-    persist();
+  function toggle(key, btn){
+    var on = !state.checks[key];
+    if (on) state.checks[key] = true; else delete state.checks[key];
+    // まず押した本人を即座に反映する（この行より後で何が失敗してもチェックは入る）
+    if (btn) btn.setAttribute("aria-pressed", on ? "true" : "false");
+    try { persist(); } catch(e){}
+    try { sync(); } catch(e){}
   }
 
   var notesEl = document.getElementById("notes");
-  notesEl.value = state.notes || "";
-  notesEl.addEventListener("input", function(){ state.notes = notesEl.value; persist(); });
+  if (notesEl){
+    notesEl.value = state.notes || "";
+    notesEl.addEventListener("input", function(){ state.notes = notesEl.value; persist(); });
+  }
 
   sync();
 
@@ -606,7 +613,7 @@
         if (Date.now() - lastLocal < 5000) return;
         lastApplied = stamp;
         state.checks = remote.checks || {};
-        if (typeof remote.notes === "string" && document.activeElement !== notesEl) state.notes = remote.notes;
+        if (typeof remote.notes === "string" && notesEl && document.activeElement !== notesEl) state.notes = remote.notes;
         try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e){}
         sync();
       }, function(){ setSaveState("この端末にのみ保存"); });
