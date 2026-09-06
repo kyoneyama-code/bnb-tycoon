@@ -416,18 +416,26 @@
   var LS = "takken-board-v1";
   try { var raw = localStorage.getItem(LS); if (raw) state = JSON.parse(raw); } catch(e){}
   if (!state.checks) state.checks = {};
-  var db = null, docRef = null, writeTimer = null, applying = false;
+  var db = null, docRef = null, writeTimer = null;
+  // 端末間同期の要：ローカルの操作が常に勝つ。リモートは「自分より新しいとき」だけ取り込む
+  var lastLocal = 0, lastApplied = 0, writing = false;
 
   function persist(){
+    lastLocal = Date.now();
     try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e){}
     if (!docRef) return;
     clearTimeout(writeTimer);
     writeTimer = setTimeout(function(){
+      writing = true;
       setSaveState("保存中…");
-      docRef.set({checks:state.checks, notes:state.notes, updatedAt:Date.now()})
-        .then(function(){ setSaveState("保存済み"); })
-        .catch(function(e){ setSaveState(e && e.code === "resource_exhausted" ? "混雑中。少し待って操作してください" : "この端末にのみ保存中"); });
-    }, 500);
+      var stamp = Date.now();
+      docRef.set({checks:state.checks, notes:state.notes, updatedAt:stamp})
+        .then(function(){ lastApplied = stamp; writing = false; setSaveState("保存済み"); })
+        .catch(function(e){
+          writing = false;
+          setSaveState(e && e.code === "resource_exhausted" ? "混雑中。少し待ってから操作してください" : "この端末にのみ保存");
+        });
+    }, 300);
   }
   var saveEl = document.getElementById("save-state");
   var saveTimer = null;
@@ -563,7 +571,7 @@
     document.getElementById("pct-all").textContent = pct+"% 完了";
     document.getElementById("cnt-all").textContent = doneAll+" / "+allKeys.length;
     var nt = document.getElementById("notes");
-    if (!applying && document.activeElement !== nt && nt.value !== (state.notes||"")) nt.value = state.notes || "";
+    if (document.activeElement !== nt && nt.value !== (state.notes||"")) nt.value = state.notes || "";
   }
 
   function toggle(key){
@@ -586,16 +594,21 @@
       db = d;
       docRef = db.doc("state/progress");
       docRef.onSnapshot(function(snap){
-        if (!snap.exists) { persist(); return; }
+        if (writing || snap.metadata.hasPendingWrites) return;
+        if (!snap.exists){
+          for (var k in state.checks){ persist(); break; }
+          return;
+        }
         var remote = snap.data() || {};
-        if (snap.metadata.hasPendingWrites) return;
-        applying = true;
+        var stamp = typeof remote.updatedAt === "number" ? remote.updatedAt : 0;
+        // 自分が書いたものより古い／直近の操作中は取り込まない（タップが巻き戻るのを防ぐ）
+        if (stamp <= lastApplied) return;
+        if (Date.now() - lastLocal < 5000) return;
+        lastApplied = stamp;
         state.checks = remote.checks || {};
         if (typeof remote.notes === "string" && document.activeElement !== notesEl) state.notes = remote.notes;
-        applying = false;
         try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e){}
         sync();
-        buildTodayCard(); sync();
       }, function(){ setSaveState("この端末にのみ保存"); });
     }).catch(function(){});
   } else {

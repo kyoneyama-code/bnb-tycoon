@@ -197,14 +197,20 @@
   try { var raw = localStorage.getItem(LS); if (raw) state = JSON.parse(raw); } catch(e){}
   if (!state.mastered) state.mastered = {};
   var docRef = null, timer = null;
+  var lastLocal = 0, lastApplied = 0, writing = false;
 
   function persist(){
+    lastLocal = Date.now();
     try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e){}
     if (!docRef) return;
     clearTimeout(timer);
     timer = setTimeout(function(){
-      docRef.set({mastered:state.mastered, updatedAt:Date.now()}).catch(function(){});
-    }, 500);
+      writing = true;
+      var stamp = Date.now();
+      docRef.set({mastered:state.mastered, updatedAt:stamp})
+        .then(function(){ lastApplied = stamp; writing = false; })
+        .catch(function(){ writing = false; });
+    }, 300);
   }
 
   var filter = "all", hideMastered = false;
@@ -281,8 +287,12 @@
       if (!db) return;
       docRef = db.doc("state/mastered");
       docRef.onSnapshot(function(snap){
-        if (!snap.exists || snap.metadata.hasPendingWrites) return;
+        if (writing || snap.metadata.hasPendingWrites || !snap.exists) return;
         var r = snap.data() || {};
+        var stamp = typeof r.updatedAt === "number" ? r.updatedAt : 0;
+        if (stamp <= lastApplied) return;
+        if (Date.now() - lastLocal < 5000) return;
+        lastApplied = stamp;
         state.mastered = r.mastered || {};
         try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e){}
         render();
