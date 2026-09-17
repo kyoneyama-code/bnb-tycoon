@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>河口湖駅前 複合施設プロジェクト 融資計画書 — 株式会社山梨中央銀行 御中（社内ドラフト） — MTR Investment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --accent:#2f5d50; --accent-soft:#e7efe9; --accent-dark:#1c3a31;
+      --bg:#f3f1ec; --card:#ffffff; --border:#e4e0d6;
+      --ink:#1c2622; --ink-sub:#6f7a75; --warn:#b13b2b; --warn-soft:#fbeeeb;}
+
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);
+      font-family:'Noto Sans JP',sans-serif;font-size:14.5px;line-height:1.75;
+      -webkit-text-size-adjust:100%}
+    .wrap{max-width:860px;margin:0 auto;padding:0 16px 80px}
+    #pw-gate{position:fixed;inset:0;z-index:500;background:var(--bg);
+      display:flex;align-items:center;justify-content:center;padding:24px}
+    #pw-gate.unlocked{display:none}
+    .pw-box{width:100%;max-width:340px;text-align:center;background:#fff;
+      border:1px solid var(--border);border-radius:18px;padding:32px 26px;
+      box-shadow:0 6px 24px rgba(40,40,30,.08)}
+    .pw-tag{display:inline-block;font-family:'Outfit',sans-serif;font-weight:800;
+      font-size:11px;letter-spacing:.14em;color:#fff;background:var(--accent);
+      padding:3px 11px;border-radius:7px;margin-bottom:14px}
+    .pw-title{font-family:Georgia,"Hiragino Mincho ProN",serif;font-weight:700;
+      font-size:21px;margin-bottom:6px}
+    .pw-desc{font-size:12.5px;color:var(--ink-sub);margin-bottom:20px;line-height:1.6}
+    #pw-form{display:flex;flex-direction:column;gap:10px}
+    #pw-input{width:100%;padding:12px 14px;font-size:16px;border:1.5px solid var(--border);
+      border-radius:12px;font-family:inherit;outline:none;-webkit-appearance:none}
+    #pw-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,93,80,.12)}
+    #pw-form button{padding:12px;font-size:15px;font-weight:700;color:#fff;
+      background:var(--accent);border:none;border-radius:12px;cursor:pointer;font-family:inherit}
+    .pw-error{font-size:12.5px;color:var(--warn);margin-top:12px;min-height:16px}
+    header{background:var(--accent);color:#fff;padding:26px 16px 22px;margin-bottom:22px}
+    header .inner{max-width:860px;margin:0 auto}
+    .site-tag{display:inline-block;font-family:'Outfit',sans-serif;font-weight:800;
+      font-size:10.5px;letter-spacing:.14em;background:rgba(255,255,255,.18);
+      padding:3px 10px;border-radius:6px;margin-bottom:10px}
+    .case-badge{display:inline-block;font-family:'Outfit',sans-serif;font-weight:800;
+      font-size:10.5px;letter-spacing:.1em;background:#fff;color:var(--accent);
+      padding:3px 10px;border-radius:6px;margin:0 0 10px 6px}
+    h1{font-family:Georgia,"Hiragino Mincho ProN",serif;font-size:22px;
+      line-height:1.45;margin:0 0 6px;font-weight:700}
+    .sub{font-size:12.5px;opacity:.85;margin:0}
+    .back{display:inline-block;margin-top:14px;font-size:12.5px;color:#fff;
+      text-decoration:none;border-bottom:1px solid rgba(255,255,255,.45);margin-right:14px}
+    section{background:var(--card);border:1px solid var(--border);border-radius:16px;
+      padding:20px 18px;margin-bottom:16px}
+    h2{font-size:16px;margin:0 0 4px;display:flex;align-items:center;gap:8px;
+      font-weight:700;color:var(--accent-dark)}
+    h2 .no{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;color:#fff;
+      background:var(--accent);width:22px;height:22px;border-radius:7px;
+      display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+    .lead{font-size:12.8px;color:var(--ink-sub);margin:0 0 16px;padding-left:30px}
+    h3{font-size:13.5px;margin:20px 0 8px;color:var(--accent-dark);
+      border-left:3px solid var(--accent);padding-left:9px}
+    h3:first-of-type{margin-top:4px}
+    p{margin:0 0 10px} ul{margin:0 0 10px;padding-left:20px} li{margin-bottom:5px}
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:4px 0 16px}
+    .kpi{background:var(--accent-soft);border-radius:12px;padding:13px 14px}
+    .kpi .k{font-size:11px;color:var(--accent-dark);opacity:.85;font-weight:500}
+    .kpi .v{font-family:'Outfit',sans-serif;font-size:21px;font-weight:800;
+      color:var(--accent-dark);line-height:1.25;margin-top:2px}
+    .kpi .n{font-size:11px;color:var(--ink-sub);margin-top:2px}
+    .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 0 10px}
+    table{border-collapse:collapse;width:100%;min-width:480px;font-size:13px}
+    th,td{border-bottom:1px solid var(--border);padding:9px 10px;text-align:right;white-space:nowrap}
+    th{background:var(--accent-soft);color:var(--accent-dark);font-weight:700;font-size:12px}
+    th:first-child,td:first-child{text-align:left;white-space:normal;min-width:130px}
+    tr.total td{font-weight:800;background:#faf8f4;border-top:2px solid var(--accent);
+      border-bottom:2px solid var(--accent)}
+    tr.sub td{color:var(--ink-sub)}
+    tr.hl td{background:var(--accent-soft)}
+    td.good{color:var(--accent);font-weight:700}
+    td.bad{color:var(--warn);font-weight:700}
+    .hint{font-size:11.5px;color:var(--ink-sub);margin:0 0 14px}
+    .note{background:#faf8f4;border-left:3px solid var(--accent);border-radius:0 10px 10px 0;
+      padding:12px 14px;font-size:12.8px;margin:12px 0}
+    .alert{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 10px 10px 0;
+      padding:12px 14px;font-size:12.8px;margin:12px 0}
+    .alert b{color:var(--warn)}
+    .tbd{display:inline-block;font-size:10.5px;font-weight:700;color:var(--warn);
+      background:var(--warn-soft);border-radius:5px;padding:1px 6px;margin-left:5px;vertical-align:middle}
+    ol.chk{counter-reset:c;list-style:none;padding:0;margin:0}
+    ol.chk li{counter-increment:c;position:relative;padding:11px 0 11px 34px;
+      border-bottom:1px dashed var(--border);margin:0}
+    ol.chk li:last-child{border-bottom:none}
+    ol.chk li::before{content:counter(c);position:absolute;left:0;top:11px;
+      width:22px;height:22px;border-radius:7px;background:var(--accent-soft);
+      color:var(--accent-dark);font-family:'Outfit',sans-serif;font-weight:800;
+      font-size:11px;display:flex;align-items:center;justify-content:center}
+    ol.chk b{display:block;font-size:13.5px}
+    ol.chk span{font-size:12.3px;color:var(--ink-sub)}
+    footer{text-align:center;font-size:11.5px;color:var(--ink-sub);padding:8px 0 0}
+    /* 印刷（A4） */
+    @page{size:A4;margin:14mm 12mm 16mm}
+    @media print{
+      body{background:#fff;font-size:10.5pt;line-height:1.65}
+      .wrap{max-width:none;padding:0}
+      header{margin:-14mm -12mm 8mm;padding:14mm 12mm 8mm;
+        -webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .back{display:none}
+      section{break-inside:avoid;page-break-inside:avoid;box-shadow:none;
+        margin-bottom:9px;padding:12px 13px;border-radius:10px}
+      h2{font-size:13pt} h3{break-after:avoid;page-break-after:avoid;font-size:10.5pt}
+      table{min-width:0;font-size:9pt} th,td{padding:5px 7px}
+      .scroll{overflow:visible}
+      .kpis{grid-template-columns:repeat(4,1fr)} .kpi .v{font-size:15pt}
+      .hint,.note,.alert{font-size:8.8pt}
+      ol.chk li{padding:7px 0 7px 30px;break-inside:avoid}
+      footer{margin-top:10px} a{text-decoration:none;color:inherit}
+    }
+    @media(max-width:520px){h1{font-size:19px} section{padding:18px 14px} .lead{padding-left:0}}
+  </style>
+</head>
+<body>
+<div id="pw-gate">
+  <div class="pw-box">
+    <span class="pw-tag">MTR</span>
+    <div class="pw-title">案件A 融資計画書</div>
+    <p class="pw-desc">この画面はパスワードで保護されています。<br>閲覧にはパスワードを入力してください。</p>
+    <form id="pw-form" autocomplete="off">
+      <input type="password" id="pw-input" placeholder="パスワード" autocomplete="current-password">
+      <button type="submit">開く</button>
+    </form>
+    <p class="pw-error" id="pw-error"></p>
+  </div>
+</div>
+<script>
+(function(){
+  const PW_HASH="7854406471c9e10ca1d1fbab1c718507f597c90033cf7f30e4568102c5a03034";
+  const KEY="mtr_dash_auth_v1";
+  const gate=document.getElementById('pw-gate');
+  function unlock(){gate.classList.add('unlocked');}
+  async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+  if(sessionStorage.getItem(KEY)===PW_HASH){unlock();}
+  document.getElementById('pw-form').addEventListener('submit',async function(e){
+    e.preventDefault();
+    const err=document.getElementById('pw-error');
+    const v=document.getElementById('pw-input').value;
+    try{const h=await sha256(v);
+      if(h===PW_HASH){sessionStorage.setItem(KEY,h);unlock();}
+      else{err.textContent='パスワードが違います。';document.getElementById('pw-input').value='';}
+    }catch(_){err.textContent='この環境では照合できません（https でアクセスしてください）。';}
+  });
+})();
+</script>
+<header>
+  <div class="inner">
+    <span class="site-tag">MTR INVESTMENT</span><span class="case-badge">案件 A</span>
+    <h1>河口湖駅前 複合施設プロジェクト 融資計画書<br>— 株式会社山梨中央銀行 御中（社内ドラフト）</h1>
+    <p class="sub">申込金額 2億7,000万円／駅前物件取得・改装・社員寮整備</p>
+    <a class="back" href="dashboard-mtr-biz2025.html">← MTR 不動産ダッシュボード</a><a class="back" href="okukawaguchiko-financing-plan.html">案件B 奥河口湖 →</a>
+  </div>
+</header>
+<div class="wrap">
+
+<section>
+  <h2><span class="no">0</span>エグゼクティブサマリー</h2>
+  <p class="lead">上場企業APを店子に迎える、不動産取得型の案件。</p>
+
+  <div class="kpis">
+    <div class="kpi"><div class="k">申込金額</div><div class="v">2.7億円</div><div class="n">証書貸付・元利均等</div></div>
+    <div class="kpi"><div class="k">推奨期間</div><div class="v">25年</div><div class="n">据置12ヶ月</div></div>
+    <div class="kpi"><div class="k">年間返済額</div><div class="v">1,373万</div><div class="n">金利2.0%想定</div></div>
+    <div class="kpi"><div class="k">DSCR（平年度）</div><div class="v">2.27倍</div><div class="n">FY2029以降</div></div>
+  </div>
+
+  <h3>この案件の要点（3行）</h3>
+  <ul>
+    <li><b>賃料が固定で入る。</b> MTRが物件を取得し、<b>上場企業であるAPホールディングス</b>（FY2026 連結売上218.2億円・営業利益8.45億円）へ一括転貸する。月120万円・年1,440万円は賃貸借契約で固定される収入であり、飲食の売上変動を直接には受けない。</li>
+    <li><b>期間25年が生命線。</b> 25年で組めば、<b>賃料収入だけで元利返済が完結する（DSCR 1.05倍）</b>。20年だと0.88倍で割れ、宿泊事業（bnb+）の収益に依存する構造になる。この差が本件の交渉の全て。</li>
+    <li><b>担保がある。</b> 資金の大半は土地・建物の取得費であり、取得物件そのものに抵当権を設定できる。無担保の運転資金ではなく、法定耐用年数22年の資産に対する長期資金である。</li>
+  </ul>
+
+  <div class="note">
+    本件はMTRインベストメントが同時に申し込む2件のうちの<b>案件A</b>。もう1件は<b>案件B：奥河口湖 リゾート民泊プロジェクト（3,000万円）</b>で、事業の性格が全く異なるため別建てとしている（詳細は第6章）。
+  </div>
+</section>
+
+<section>
+  <h2><span class="no">1</span>事業概要</h2>
+  <p class="lead">河口湖駅前の複合施設。飲食・宿泊・社員寮を一体で整備する。</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>区画</th><th>業態</th><th>運営主体</th><th>MTRの収入</th></tr></thead>
+    <tbody>
+      <tr><td>飲食 2店舗 ＋ カフェ 1店舗</td><td>飲食</td><td>APホールディングス</td><td>賃料</td></tr>
+      <tr><td>宿泊 1店舗</td><td>簡易宿所（bnb+）</td><td>bnb+</td><td>宿泊事業利益</td></tr>
+      <tr><td>社員寮</td><td>従業員住居</td><td>MTR（自社利用）</td><td>—（採用・定着に寄与）</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <ul>
+    <li><b>所在</b>　河口湖駅前 <span class="tbd">住所・地番 要記載</span></li>
+    <li><b>取得主体</b>　MTRインベストメント（不動産を保有し、APへ転貸）</li>
+    <li><b>開業予定</b>　2027年3月</li>
+    <li><b>役割分担</b>　MTRが不動産リスクを持ち、営業リスクは運営側（AP・bnb+）が負う。銀行から見れば、返済原資が飲食の損益変動から一段切り離された構造になっている。</li>
+  </ul>
+
+  <div class="note">
+    <b>河口湖駅は町の玄関口。</b> 富士五湖エリアの鉄道・バスの結節点であり、インバウンドを含む来訪者が最初に降り立つ場所。ここに飲食と宿泊と従業員住居をまとめて置く投資であり、単独店舗の出店とは意味が違う。
+  </div>
+</section>
+
+<section>
+  <h2><span class="no">2</span>資金使途</h2>
+  <p class="lead">確定額は売買契約で固まる。下表は枠組みの仮置き。</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>使途</th><th>金額</th><th>資産区分</th><th>確度</th></tr></thead>
+    <tbody>
+      <tr><td>駅前物件 取得費（土地・建物・登記・仲介）</td><td>20,000万円</td><td>不動産</td><td>仮置き</td></tr>
+      <tr><td>改装・厨房・宿泊内装（MTR負担分）</td><td>4,000万円</td><td>建物附属設備</td><td>仮置き</td></tr>
+      <tr><td>社員寮 取得・改修</td><td>2,000万円</td><td>不動産</td><td>仮置き</td></tr>
+      <tr><td>諸費用・予備費・開業運転資金</td><td>1,000万円</td><td>—</td><td>仮置き</td></tr>
+      <tr class="total"><td>合計</td><td>27,000万円</td><td></td><td></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="hint">※4項目すべてが3億円の枠内に収まるよう置いた仮数字であり、<b>銀行提出前に実額への差し替えが必須</b>。特に取得費は見積書・売買契約書と完全に一致させること。土地と建物の按分は減価償却額を左右するため、契約書上で明示しておくこと。</p>
+</section>
+
+<section>
+  <h2><span class="no">3</span>返済原資</h2>
+  <p class="lead">性格の異なる2本。片方は契約で固定、片方は変動。</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>収益源</th><th>月額</th><th>年換算</th><th>性格</th><th>開始</th></tr></thead>
+    <tbody>
+      <tr><td>① AP転貸 賃料収入</td><td>120万円</td><td>1,440万円</td><td>固定・契約</td><td>2027年3月</td></tr>
+      <tr><td>② bnb+ 宿泊事業利益</td><td>140万円</td><td>1,680万円</td><td>変動</td><td>2027年3月</td></tr>
+      <tr class="total"><td>合計（平年度）</td><td>260万円</td><td>3,120万円</td><td></td><td>FY2029〜</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="hint">各数値は<b>減価償却前・支払利息前の事業段階利益（EBITDA相当）</b>として扱っている。</p>
+
+  <div class="alert">
+    <b>要確認</b>　②bnb+の月140万円が<b>どの法人のPLに立つか</b>を整理すること。借入名義人であるMTRの収益でなければ、本計画の返済原資は①の1,440万円のみとなり、DSCRは2.27倍から1.05倍に落ちる。銀行は必ず「借入名義人のキャッシュフロー」で見るため、ここが曖昧なまま提出すると計画の信頼性を失う。<br>
+    bnb+が別法人運営となる場合は、<b>MTRが受け取る形（賃料または業務委託手数料）に契約を組み替える</b>ことを検討する。
+  </div>
+</section>
+
+<section>
+  <h2><span class="no">4</span>5ヵ年収支計画（3月決算・単位：万円）</h2>
+  <p class="lead">開業は2027年3月。FY2028が実質初年度となる。</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>項目</th><th>FY2027</th><th>FY2028</th><th>FY2029</th><th>FY2030</th><th>FY2031</th></tr></thead>
+    <tbody>
+      <tr><td>① AP転貸 賃料</td><td>0</td><td>1,440</td><td>1,440</td><td>1,440</td><td>1,440</td></tr>
+      <tr><td>② bnb+ 宿泊</td><td>0</td><td>1,176</td><td>1,680</td><td>1,680</td><td>1,680</td></tr>
+      <tr class="total"><td>事業EBITDA 合計</td><td>0</td><td>2,616</td><td>3,120</td><td>3,120</td><td>3,120</td></tr>
+      <tr><td>年間返済額（2.0%／25年）</td><td>据置</td><td>1,373</td><td>1,373</td><td>1,373</td><td>1,373</td></tr>
+      <tr class="total"><td>DSCR</td><td>—</td><td class="good">1.91</td><td class="good">2.27</td><td class="good">2.27</td><td class="good">2.27</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="hint">FY2028のbnb+は立ち上がり率70%（1,680→1,176）で計上。賃料は契約ベースのため満額。</p>
+
+  <div class="alert">
+    <b>据置期間12ヶ月が必須。</b> 物件取得から開業まで収入がゼロの期間（FY2027）が発生する。据置期間中の利息（初年度 約532万円）は、<b>同一法人内で稼働中の奥河口湖 別荘民泊のキャッシュフロー</b>（案件B・年3,000〜4,000万円）で賄える。この点は銀行に対する強い説明材料になるので、面談で必ず伝えること。
+  </div>
+
+  <h3>税引後の返済余力（FY2029・金利2.0%／25年）</h3>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>項目</th><th>金額</th></tr></thead>
+    <tbody>
+      <tr><td>事業EBITDA</td><td>3,120万円</td></tr>
+      <tr><td>− 減価償却費 <span class="tbd">仮置き</span></td><td>▲1,267万円</td></tr>
+      <tr><td>− 支払利息</td><td>▲532万円</td></tr>
+      <tr><td>税引前利益</td><td>1,321万円</td></tr>
+      <tr><td>− 法人税等（実効34%）</td><td>▲449万円</td></tr>
+      <tr><td>税引後利益</td><td>872万円</td></tr>
+      <tr><td>＋ 減価償却費 戻し</td><td>1,267万円</td></tr>
+      <tr class="total"><td>簡易キャッシュフロー</td><td>2,139万円</td></tr>
+      <tr><td>年間元金返済額</td><td>841万円</td></tr>
+      <tr class="total"><td>返済余力（対元金）</td><td class="good">2.54倍</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="hint">減価償却1,267万円＝建物2.0億円／22年（909万円）＋内装4,000万円／15年（267万円）＋社員寮2,000万円／22年（91万円）の仮置き。土地建物按分の確定後に精緻化する。</p>
+</section>
+
+<section>
+  <h2><span class="no">5</span>返済シミュレーション</h2>
+  <p class="lead">2億7,000万円・元利均等の年間返済額（万円）。</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>金利 ＼ 期間</th><th>15年</th><th>20年</th><th>25年</th><th>30年</th></tr></thead>
+    <tbody>
+      <tr><td>1.5%</td><td>2,011</td><td>1,563</td><td>1,296</td><td>1,118</td></tr>
+      <tr class="hl"><td>2.0%（想定）</td><td>2,085</td><td>1,639</td><td>1,373</td><td>1,198</td></tr>
+      <tr><td>2.5%</td><td>2,160</td><td>1,717</td><td>1,454</td><td>1,280</td></tr>
+      <tr><td>3.0%</td><td>2,237</td><td>1,797</td><td>1,536</td><td>1,366</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>ストレステスト（金利2.0%）</h3>
+  <p>本件で最も重要な指標は<b>「賃料収入だけで元利返済が回るか」</b>。bnb+の宿泊事業がゼロになっても返済が続く構造かどうかを、期間別に検証する。</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>シナリオ（年間CF）</th><th>15年</th><th>20年</th><th>25年</th><th>30年</th></tr></thead>
+    <tbody>
+      <tr><td>標準 3,120万円</td><td class="good">1.50</td><td class="good">1.90</td><td class="good">2.27</td><td class="good">2.61</td></tr>
+      <tr><td>開業初年度 2,616万円</td><td class="good">1.25</td><td class="good">1.60</td><td class="good">1.91</td><td class="good">2.18</td></tr>
+      <tr><td>bnb+ ▲50% 2,280万円</td><td class="good">1.09</td><td class="good">1.39</td><td class="good">1.66</td><td class="good">1.90</td></tr>
+      <tr class="hl"><td><b>賃料のみ（bnb+ ゼロ）1,440万円</b></td><td class="bad">0.69</td><td class="bad">0.88</td><td class="good">1.05</td><td class="good">1.20</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="hint">最下段が分岐点。<b>25年以上でなければ、賃料だけでは元利返済が回らない。</b> これが期間25年を求める根拠そのものであり、銀行にはこの1枚を必ず持参する。</p>
+
+  <h3>借入額を下げた場合（「賃料のみ」DSCR）</h3>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>借入額</th><th>20年</th><th>25年</th><th>30年</th></tr></thead>
+    <tbody>
+      <tr><td>27,000万円（申込額）</td><td class="bad">0.88</td><td class="good">1.05</td><td class="good">1.20</td></tr>
+      <tr><td>25,000万円</td><td class="bad">0.95</td><td class="good">1.13</td><td class="good">1.30</td></tr>
+      <tr class="hl"><td>24,000万円（自己資金3,000万投入）</td><td class="bad">0.99</td><td class="good">1.18</td><td class="good">1.35</td></tr>
+      <tr><td>22,000万円</td><td class="good">1.08</td><td class="good">1.29</td><td class="good">1.48</td></tr>
+      <tr><td>20,000万円</td><td class="good">1.19</td><td class="good">1.42</td><td class="good">1.62</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="hint">25年が取れない場合の代替案。<b>自己資金3,000万円を投入して借入を2.4億円に下げても、20年では0.99倍で届かない。</b> 借入額を削るより期間を伸ばす方が効率が良い。交渉の優先順位は明確に「期間 ＞ 金利 ＞ 借入額」。</p>
+
+  <div class="note">
+    金利が1.5%→3.0%に上振れしても年間返済の増加は240万円（25年）。平年度EBITDA 3,120万円に対して8%であり、<b>金利上昇は本件の致命傷にはならない</b>。ただし案件Aは案件Bほど余裕がないため、金利も無視はできない。
+  </div>
+</section>
+
+<section>
+  <h2><span class="no">6</span>2件に分けて申し込む理由</h2>
+  <p class="lead">同時申込だが、性格の違う事業を1本にまとめない。</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>比較軸</th><th>案件A 河口湖駅前</th><th>案件B 奥河口湖</th></tr></thead>
+    <tbody>
+      <tr><td>事業の性格</td><td>商業不動産の取得・賃貸</td><td>稼働中リゾート民泊の増設</td></tr>
+      <tr><td>取得資産</td><td>土地・建物（不動産）</td><td>トレーラーハウス（動産）</td></tr>
+      <tr><td>法定耐用年数</td><td>22年（建物）</td><td>4年（車両）</td></tr>
+      <tr><td>主な収入</td><td>賃料（固定・契約）</td><td>宿泊売上（変動・実績あり）</td></tr>
+      <tr><td>担保</td><td>取得物件に設定可</td><td>動産・無担保想定</td></tr>
+      <tr><td>申込額</td><td>27,000万円</td><td>3,000万円</td></tr>
+      <tr class="total"><td>適した期間</td><td>25年</td><td>7年</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>分ける実利は「期間を資産の寿命に合わせられる」こと</h3>
+  <p>一本化して3億円を20年で組むと、<b>4年で償却が終わるトレーラーハウスに20年の返済がぶら下がる</b>。設備が更新期を迎えた時点で借金だけが残る、典型的な期間ミスマッチになる。分ければ、建物は25年・動産は7年と、それぞれの寿命に返済を合わせられる。</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>方式</th><th>年間返済額 合計</th><th>期間の整合</th></tr></thead>
+    <tbody>
+      <tr><td>一本化（3億円・20年）</td><td>1,821万円</td><td class="bad">ミスマッチ</td></tr>
+      <tr class="hl"><td>分割（A 2.7億25年 ＋ B 3,000万7年）</td><td>1,833万円</td><td class="good">整合</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="hint">年間返済の合計は<b>わずか12万円しか変わらない</b>。つまり分けることによるコスト増は実質ゼロで、期間整合というメリットだけが残る。加えて、事業ごとの採算が銀行から見えるため、片方の不調がもう片方の評価を巻き込まない。</p>
+
+  <div class="alert">
+    <b>ただし与信判断は合算される。</b> 申込を2本に分けても、山梨中央銀行はMTRインベストメント1社への総与信3億円として審査する。分割は「審査を軽くする手段」ではなく「条件を最適化する手段」である点は、面談で先に自分から明言しておくこと。隠していると見なされると心証を損ねる。<br>
+    参考：MTR全社ベースでは、案件A 3,120万＋案件B 4,700万＋マキシマムアビリティ配当840万＝<b>8,660万円／年</b>のキャッシュフローに対し、返済合計1,833万円＝<b>全社DSCR 4.72倍</b>。
+  </div>
+</section>
+
+<section>
+  <h2><span class="no">7</span>山梨中央銀行に対する訴求</h2>
+  <p class="lead">地銀が見るのは数字だけではない。地域とのつながりを正面に置く。</p>
+
+  <h3>与信面の強み</h3>
+  <ul>
+    <li><b>上場企業がテナント</b>　APホールディングスは約40ブランド・約154店舗を展開。FY2026は連結売上218.2億円・営業利益8.45億円で黒字転換済み。賃料の支払能力が明確。</li>
+    <li><b>不動産と運営の分離</b>　MTRは賃料という安定収入を取り、営業リスクは運営側が負う。返済原資が飲食の損益変動から一段切り離されている。</li>
+    <li><b>担保設定が可能</b>　資金の大半が土地・建物の取得費であり、取得物件に抵当権を設定できる。</li>
+    <li><b>生販直結モデル</b>　グループの生産→加工・物流→販売の一貫体制により、インフレ下でも高品質低価格を維持できる。仕入れ変動に対する耐性が一般的な飲食テナントより高く、賃料の継続性に直結する。</li>
+  </ul>
+
+  <h3>地域への貢献（山梨中央銀行の関心事）</h3>
+  <ul>
+    <li><b>社員寮の整備</b>　観光地の最大の制約である住居不足に自前で手を打つ。地元採用と定着に直結し、単なる商業投資ではないことを示す最も分かりやすい材料。<b>この案件で最も稟議に書きやすい項目</b>。</li>
+    <li><b>富士河口湖町での通年雇用</b>　飲食2店舗＋カフェ1店舗＋宿泊1施設。季節労働ではない通年の雇用を生む。</li>
+    <li><b>駅前の活性化</b>　町の玄関口への投資であり、行政との協働余地も大きい。</li>
+    <li><b>県内調達</b>　既存プロジェクトで甲府拠点の事業者を含む業者比較を実施済み。県内経済への還流を具体的に説明できる。</li>
+  </ul>
+
+  <h3>継続取引の入口として</h3>
+  <p>山梨県内では忍野村 体験ビレッジ（総投資11.37億円・2028年夏開業目標）が並走している。河口湖案件を先に走らせて実績を作り、忍野村へ繋げる<b>県内2拠点構想</b>として提示すれば、山梨中央銀行にとっては単発融資ではなく継続取引の入口になる。ただし<b>グループ全体の与信枠を意識させる副作用もある</b>ため、どこまで開示するかは会長判断。</p>
+</section>
+
+<section>
+  <h2><span class="no">8</span>リスクと対応</h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>リスク</th><th>対応</th></tr></thead>
+    <tbody>
+      <tr><td>AP転貸の継続性</td><td>本件の生命線。賃貸借契約の期間・中途解約条項を提出前に確定する。普通借家・長期で組めれば担保力が上がる。</td></tr>
+      <tr><td>bnb+ の収益未達</td><td>25年で組めば賃料のみでも元利返済が回る（DSCR 1.05倍）設計。期間確保がそのままリスク対策になる。</td></tr>
+      <tr><td>開業遅延・収入ゼロ期間</td><td>据置12ヶ月。据置期間中の利息は稼働中の別荘民泊（案件B）のCFで賄う。</td></tr>
+      <tr><td>用途変更・消防設備</td><td>飲食＋宿泊の複合用途は特殊建築物扱い。売買契約前に建築士の確認を入れる。</td></tr>
+      <tr><td>簡易宿所の許可</td><td>bnb+は旅館業法の簡易宿所前提。フロント要件・消防法令適合通知書の取得を開業逆算で進める。</td></tr>
+      <tr><td>金利上昇</td><td>3.0%まで上振れしても年間負担増240万円。ただし案件Bほど余裕はないため金利交渉も行う。</td></tr>
+      <tr><td>建物の老朽化・修繕</td><td>中古取得の場合、長期修繕の見込みを事前に把握する。25年返済に対し建物が持つかを建築士に確認。</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2><span class="no">9</span>銀行提出前に確定が必要な項目</h2>
+  <p class="lead">ここが埋まらないと審査は前に進まない。上から順に潰す。</p>
+  <ol class="chk">
+    <li><b>駅前物件の売買条件</b><span>価格・契約時期・土地建物按分・登記情報・担保評価。本計画の2億円は仮置き。</span></li>
+    <li><b>MTRインベストメントの直近決算</b><span>BS／PL 3期分、既存借入残高と返済予定表。銀行が最初に求める書類。</span></li>
+    <li><b>AP転貸の賃貸借契約書</b><span>月額120万円の期間・更新条件・中途解約条項。契約書の有無で賃料の評価が変わる。本件で最重要。</span></li>
+    <li><b>bnb+ の事業主体と収益の帰属</b><span>月140万円がMTRのPLに立つのか別法人か。DSCRが2.27倍と1.05倍に分かれる分岐点。</span></li>
+    <li><b>自己資金の投入額</b><span>2.7億円が総投資の全額か一部か。自己資金比率が金利と期間に直結する。</span></li>
+    <li><b>社員寮の計画</b><span>取得か賃借か、投資額、収容人数。地域貢献の訴求材料としても効く。</span></li>
+    <li><b>建物の遵法性・検査済証</b><span>用途変更の要否、消防設備の現況。中古取得なら必須の確認事項。</span></li>
+    <li><b>担保・保証の想定</b><span>取得物件への抵当権設定、代表者連帯保証の要否（経営者保証GL適用余地）。</span></li>
+  </ol>
+  <div class="alert">
+    <b>最優先は1・3・4。</b> 売買条件（1）が無ければ金額が固まらず、賃貸借契約（3）が無ければ返済原資が固まらず、bnb+の帰属（4）が曖昧だとDSCRが半分になる。この3つが揃っていない状態で持ち込むと、雑談で終わって時間を失う。
+  </div>
+</section>
+
+<section>
+  <h2><span class="no">10</span>次のアクション</h2>
+  <ol class="chk">
+    <li><b>駅前物件の売買条件を確定させる</b><span>本計画の資金使途を実額に差し替える。担当：MTRチーム</span></li>
+    <li><b>AP転貸の賃貸借契約を締結・書面化する</b><span>月120万円・期間・解約条項。返済原資の裏付けとして最重要。</span></li>
+    <li><b>bnb+ の収益帰属を決める</b><span>MTR直営か、別法人からMTRが受け取る形に組み替えるか。</span></li>
+    <li><b>MTR決算3期分・既存借入一覧を揃える</b><span>案件Bと共通の提出書類。1回の準備で両方に使える。</span></li>
+    <li><b>山梨中央銀行へ事前相談のアポイント</b><span>案件A・Bを同時に持参し、分ける理由を最初に説明する。Aは期間25年・据置12ヶ月を提示。</span></li>
+  </ol>
+</section>
+
+<footer>
+  MTR Investment ／ 社内ドラフト・非公開<br>
+  仮置きの数値を含みます。銀行提出前に実額へ差し替えてください。
+</footer>
+</div>
+</body>
+</html>
